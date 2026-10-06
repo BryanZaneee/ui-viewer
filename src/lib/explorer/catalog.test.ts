@@ -100,3 +100,47 @@ test("semantic matches preserve explicit library and category filters", () => {
     ),
   );
 });
+
+test("live values parse numbers by purpose, bound inputs and preserve content", async () => {
+  const { validAppearance, randomized } = await import("./values");
+  const a = appearance(
+    'dark progress at 72% radius 12px gap 8px title "Downloads"',
+  );
+  assert.equal(a.value, 72);
+  assert.equal(a.radius, 12);
+  assert.equal(a.spacing, 8);
+  assert.equal(a.title, "Downloads");
+  assert.equal(appearance("checklist for RTX 3060").amount, undefined);
+  assert.equal(appearance("price $49.99").amount, 49.99);
+  assert.deepEqual(
+    appearance("checklist items: RTX 3060, CPU and motherboard").items,
+    ["RTX 3060", "CPU", "motherboard"],
+  );
+  assert(validAppearance(a));
+  assert(!validAppearance({ ...a, items: ["x".repeat(81)] }));
+  for (const values of [
+    { value: NaN },
+    { radius: 100 },
+    { scale: 10 },
+    { amount: Infinity },
+    { items: [3] },
+  ])
+    assert(!validAppearance({ ...a, ...values }));
+  for (const pattern of [
+    "checkbox",
+    "progress",
+    "pricing",
+    "ticker",
+  ] as const) {
+    const customized = { ...a, items: ["RTX 3060", "CPU", "motherboard"] };
+    const random = randomized(customized, pattern);
+    assert(validAppearance(random));
+    assert.deepEqual(random.items, customized.items);
+  }
+  const swift = sourceFor(
+    catalog.find((e) => e.id === "swiftui-checkbox")!,
+    { ...a, items: ["RTX 3060", "CPU", "motherboard"] },
+  );
+  assert(swift.includes('"RTX 3060", "CPU", "motherboard"'));
+  assert(swift.includes("selected.contains(index)"));
+});

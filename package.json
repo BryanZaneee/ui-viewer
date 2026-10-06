@@ -13,6 +13,7 @@
     "check": "npm run typecheck && npm test && vite build && npm run build:server",
     "screenshots": "node scripts/screenshots.mjs",
     "bundle": "node scripts/bundle-report.mjs",
+    "test:editor": "node scripts/check-editor.mjs",
     "test:previews": "node --import tsx scripts/check-previews.mjs",
     "build:server": "esbuild server/index.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist-server/index.mjs",
     "start:server": "node dist-server/index.mjs"

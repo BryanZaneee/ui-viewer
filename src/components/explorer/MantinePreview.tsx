@@ -69,8 +69,8 @@ export default function MantinePreview(props: PreviewProps) {
     select: () => (
       <Select
         label="Workspace"
-        defaultValue="Personal"
-        data={["Personal", "Team", "Studio"]}
+        defaultValue={a.items?.[0] ?? "Personal"}
+        data={a.items ?? ["Personal", "Team", "Studio"]}
         allowDeselect={false}
       />
     ),
@@ -85,7 +85,7 @@ export default function MantinePreview(props: PreviewProps) {
       <SegmentedControl
         value={value}
         onChange={change}
-        data={["Overview", "Activity", "Settings"]}
+        data={a.items ?? ["Overview", "Activity", "Settings"]}
         fullWidth
         size="xs"
       />
@@ -97,16 +97,20 @@ export default function MantinePreview(props: PreviewProps) {
     ),
     accordion: () => (
       <Accordion defaultValue="0">
-        {["Can I make it my own?", "What’s included?", "Where do I start?"].map(
-          (x, i) => (
-            <Accordion.Item value={String(i)} key={x}>
-              <Accordion.Control>{x}</Accordion.Control>
-              <Accordion.Panel>
-                Every detail is yours to explore and customize.
-              </Accordion.Panel>
-            </Accordion.Item>
-          ),
-        )}
+        {(
+          a.items ?? [
+            "Can I make it my own?",
+            "What’s included?",
+            "Where do I start?",
+          ]
+        ).map((x, i) => (
+          <Accordion.Item value={String(i)} key={x}>
+            <Accordion.Control>{x}</Accordion.Control>
+            <Accordion.Panel>
+              Every detail is yours to explore and customize.
+            </Accordion.Panel>
+          </Accordion.Item>
+        ))}
       </Accordion>
     ),
   };

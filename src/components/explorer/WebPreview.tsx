@@ -30,6 +30,7 @@ export default function WebPreview({
   library,
   ...props
 }: PreviewProps & { library: "shadcn" | "radix" | "swiftui" }) {
+  const a = props.appearance;
   const native = library === "swiftui";
   const shad = library === "shadcn";
   const c: Controls = {
@@ -163,12 +164,12 @@ export default function WebPreview({
     ),
     select: () =>
       shad ? (
-        <ShadSelect defaultValue="Personal">
+        <ShadSelect defaultValue={a.items?.[0] ?? "Personal"}>
           <SelectTrigger aria-label="Workspace" className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {["Personal", "Team", "Studio"].map((x) => (
+            {(a.items ?? ["Personal", "Team", "Studio"]).map((x) => (
               <SelectItem value={x} key={x}>
                 {x}
               </SelectItem>
@@ -178,14 +179,14 @@ export default function WebPreview({
       ) : native ? (
         <label className="demo-field">
           Workspace
-          <select defaultValue="Personal">
-            {["Personal", "Team", "Studio"].map((x) => (
+          <select defaultValue={a.items?.[0] ?? "Personal"}>
+            {(a.items ?? ["Personal", "Team", "Studio"]).map((x) => (
               <option key={x}>{x}</option>
             ))}
           </select>
         </label>
       ) : (
-        <Select.Root defaultValue="Personal">
+        <Select.Root defaultValue={a.items?.[0] ?? "Personal"}>
           <Select.Trigger className="demo-select" aria-label="Workspace">
             <Select.Value />
             <Select.Icon>
@@ -199,7 +200,7 @@ export default function WebPreview({
               sideOffset={5}
             >
               <Select.Viewport>
-                {["Personal", "Team", "Studio"].map((x) => (
+                {(a.items ?? ["Personal", "Team", "Studio"]).map((x) => (
                   <Select.Item
                     className="explorer-select-item"
                     value={x}
@@ -232,13 +233,13 @@ export default function WebPreview({
     tabs: (value, change) => (
       <Tabs.Root value={value} onValueChange={change}>
         <Tabs.List className="demo-tabs" aria-label="Views">
-          {["Overview", "Activity", "Settings"].map((x) => (
+          {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
             <Tabs.Trigger value={x} key={x}>
               {x}
             </Tabs.Trigger>
           ))}
         </Tabs.List>
-        {["Overview", "Activity", "Settings"].map((x) => (
+        {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
           <Tabs.Content value={x} key={x} className="sr-only">
             {x} view
           </Tabs.Content>
@@ -261,29 +262,33 @@ export default function WebPreview({
         defaultValue="0"
         className="demo-accordion"
       >
-        {["Can I make it my own?", "What’s included?", "Where do I start?"].map(
-          (x, i) => (
-            <Accordion.Item value={String(i)} key={x}>
-              <Accordion.Header>
-                <Accordion.Trigger>
-                  {x}
-                  <ChevronDown size={15} />
-                </Accordion.Trigger>
-              </Accordion.Header>
-              <Accordion.Content>
-                <p>
-                  {
-                    [
-                      "Every detail is yours to explore and customize.",
-                      "All the essentials for your next great idea.",
-                      "Pick a component. Try it. Make something new.",
-                    ][i]
-                  }
-                </p>
-              </Accordion.Content>
-            </Accordion.Item>
-          ),
-        )}
+        {(
+          a.items ?? [
+            "Can I make it my own?",
+            "What’s included?",
+            "Where do I start?",
+          ]
+        ).map((x, i) => (
+          <Accordion.Item value={String(i)} key={x}>
+            <Accordion.Header>
+              <Accordion.Trigger>
+                {x}
+                <ChevronDown size={15} />
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content>
+              <p>
+                {
+                  [
+                    "Every detail is yours to explore and customize.",
+                    "All the essentials for your next great idea.",
+                    "Pick a component. Try it. Make something new.",
+                  ][i]
+                }
+              </p>
+            </Accordion.Content>
+          </Accordion.Item>
+        ))}
       </Accordion.Root>
     ),
   };

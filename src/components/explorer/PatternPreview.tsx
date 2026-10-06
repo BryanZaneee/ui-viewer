@@ -1,5 +1,6 @@
-"use client";
-import { useState, type ReactNode } from "react";
+import { defaultItems } from "@/lib/explorer/values";
+("use client");
+import { useEffect, useState, type ReactNode } from "react";
 import { Check, ArrowUpRight, Sparkles } from "lucide-react";
 import type { Appearance, Pattern } from "@/lib/explorer/catalog";
 export type PreviewProps = { pattern: Pattern; appearance: Appearance };
@@ -29,9 +30,12 @@ export function PatternPreview({
   controls: c,
 }: PreviewProps & { controls: Controls }) {
   const [enabled, setEnabled] = useState(true);
-  const [value, setValue] = useState(64);
-  const [tab, setTab] = useState("Overview");
-  const [checked, setChecked] = useState([true, false, false]);
+  const [value, setValue] = useState(a.value ?? 64);
+  const [tab, setTab] = useState(a.items?.[0] ?? "Overview");
+  const [checked, setChecked] = useState<Record<number, boolean>>({ 0: true });
+  useEffect(() => {
+    setValue(a.value ?? 64);
+  }, [a.value]);
   const [action, setAction] = useState(false);
   const button = (label = a.label, secondary = false) =>
     c.button(action ? "Done!" : label, () => setAction(!action), secondary);
@@ -39,14 +43,10 @@ export function PatternPreview({
     c.toggle(label, enabled, setEnabled);
   const checklist = () => (
     <div className="demo-stack">
-      {[
-        "Explore the possibilities",
-        "Make it your own",
-        "Ship something great",
-      ].map((label, i) => (
-        <div key={label}>
-          {c.checkbox(label, checked[i], (v) =>
-            setChecked((old) => old.map((x, j) => (i === j ? v : x))),
+      {(a.items ?? defaultItems).map((label, i) => (
+        <div key={i}>
+          {c.checkbox(label, checked[i] ?? false, (v) =>
+            setChecked((old) => ({ ...old, [i]: v })),
           )}
         </div>
       ))}
@@ -155,7 +155,9 @@ export function PatternPreview({
           }}
         >
           <div>
-            <strong className="demo-title">Welcome back.</strong>
+            <strong className="demo-title">
+              {a.title ? "" : "Welcome back."}
+            </strong>
             <p className="demo-muted">Your next idea is waiting.</p>
           </div>
           {c.field("Email address", "email")}
@@ -170,20 +172,24 @@ export function PatternPreview({
       return (
         <div className="demo-stack">
           <div className="demo-row between">
-            <span className="demo-eyebrow">THE CREATOR PLAN</span>
+            <span className="demo-eyebrow">
+              {a.title ? "" : "THE CREATOR PLAN"}
+            </span>
             <Sparkles size={17} />
           </div>
           <div>
-            <strong className="demo-price">$24</strong>
+            <strong className="demo-price">${a.amount ?? 24}</strong>
             <span className="demo-muted"> / month</span>
           </div>
           <p className="demo-muted">A little more room to create.</p>
           <div className="demo-stack demo-small">
-            {[
-              "Unlimited possibilities",
-              "Your own workspace",
-              "Every detail, yours",
-            ].map((t) => (
+            {(
+              a.items ?? [
+                "Unlimited possibilities",
+                "Your own workspace",
+                "Every detail, yours",
+              ]
+            ).map((t) => (
               <span className="demo-row" key={t}>
                 <Check size={14} />
                 {t}
@@ -196,7 +202,9 @@ export function PatternPreview({
     case "settings":
       return (
         <div className="demo-stack">
-          <strong className="demo-title">Make yourself at home.</strong>
+          <strong className="demo-title">
+            {a.title ? "" : "Make yourself at home."}
+          </strong>
           {toggle("Email notifications")}
           <div className="demo-divider" />
           {c.select()}
@@ -215,7 +223,7 @@ export function PatternPreview({
             <ArrowUpRight size={17} />
           </div>
           <div className="demo-row">
-            <strong className="demo-price">128</strong>
+            <strong className="demo-price">{a.amount ?? 128}</strong>
             <span className="demo-growth">+24.8%</span>
           </div>
           <div

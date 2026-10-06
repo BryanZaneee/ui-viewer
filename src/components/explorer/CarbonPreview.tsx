@@ -78,13 +78,17 @@ export default function CarbonPreview({
         )}
         {pattern === "accordion" && (
           <Accordion>
-            {["Make it yours", "What is included?", "Where do I start?"].map(
-              (x, i) => (
-                <AccordionItem title={x} open={i === 0} key={x}>
-                  All the essentials for your next idea.
-                </AccordionItem>
-              ),
-            )}
+            {(
+              a.items ?? [
+                "Make it yours",
+                "What is included?",
+                "Where do I start?",
+              ]
+            ).map((x, i) => (
+              <AccordionItem title={x} open={i === 0} key={x}>
+                All the essentials for your next idea.
+              </AccordionItem>
+            ))}
           </Accordion>
         )}
         {pattern === "table" && (
@@ -96,11 +100,14 @@ export default function CarbonPreview({
               </TableRow>
             </TableHead>
             <TableBody>
-              {[
-                ["Alex", "Designer"],
-                ["Sam", "Developer"],
-                ["Jordan", "Creator"],
-              ].map(([name, role]) => (
+              {(a.items
+                ? a.items.map((x) => [x, "Pending"])
+                : [
+                    ["Alex", "Designer"],
+                    ["Sam", "Developer"],
+                    ["Jordan", "Creator"],
+                  ]
+              ).map(([name, role]) => (
                 <TableRow key={name}>
                   <TableCell>{name}</TableCell>
                   <TableCell>{role}</TableCell>

@@ -12,8 +12,7 @@ export function sourceFor(entry: Entry, a: Appearance): string {
       switch: 'Toggle("Notifications", isOn: $enabled)',
       slider:
         'Text("Volume: \\(Int(value))%")\nSlider(value: $value, in: 0...100)',
-      checkbox:
-        'Toggle("Explore the possibilities", isOn: $enabled)\nToggle("Make it your own", isOn: $checked)',
+      checkbox: `ForEach(items.indices, id: \\.self) { index in\n    Toggle(items[index], isOn: Binding(\n        get: { selected.contains(index) },\n        set: { if $0 { selected.insert(index) } else { selected.remove(index) } }\n    ))\n}`,
       select:
         'Picker("Workspace", selection: $selection) {\n    Text("Personal").tag("Personal")\n    Text("Team").tag("Team")\n    Text("Studio").tag("Studio")\n}',
       progress:
@@ -30,18 +29,30 @@ export function sourceFor(entry: Entry, a: Appearance): string {
       dashboard:
         'Text("Total projects").font(.caption)\nText("128").font(.largeTitle.bold())\nText("+24.8%").foregroundStyle(.green)\nProgressView(value: value, total: 100)\nButton("Add a project") { value = min(100, value + 5) }',
     };
+    if (a.items?.length) {
+      views.select =
+        'Picker("Workspace", selection: $selection) {\n    ForEach(items, id: \\.self) { Text($0).tag($0) }\n}';
+      views.tabs =
+        'Picker("View", selection: $tab) {\n    ForEach(items, id: \\.self) { Text($0).tag($0) }\n}\n.pickerStyle(.segmented)\nText(tab)';
+      views.accordion =
+        'ForEach(items, id: \\.self) { item in\n    DisclosureGroup(item) { Text("Every detail is yours to customize.") }\n}';
+      views.pricing = `Text("$${a.amount ?? 24} / month").font(.largeTitle.bold())\nForEach(items, id: \\.self) { Label($0, systemImage: "checkmark") }\nButton(${a.label === "Continue" ? '"Get started"' : text}) {}.buttonStyle(.borderedProminent)`;
+    }
     const rgb = (a.color || "#007aff")
       .slice(1)
       .match(/../g)!
       .map((h) => (parseInt(h, 16) / 255).toFixed(3));
-    return `import SwiftUI\n\nstruct ComponentDemo: View {\n    @State private var enabled = true\n    @State private var checked = false\n    @State private var value = 64.0\n    @State private var name = ""\n    @State private var email = ""\n    @State private var password = ""\n    @State private var selection = "Personal"\n    @State private var tab = "Overview"\n\n    var body: some View {\n        VStack(alignment: .leading, spacing: ${a.compact ? 10 : 16}) {\n${(
-      views[entry.pattern.id] ?? ""
+    return `import SwiftUI\n\nstruct ComponentDemo: View {\n    @State private var enabled = true\n    @State private var checked = false\n    @State private var selected: Set<Int> = [0]\n    private let items = [${(a.items ?? ["Explore the possibilities", "Make it your own", "Ship something great"]).map((x) => JSON.stringify(x)).join(", ")}]\n    @State private var value = ${a.value ?? 64}.0\n    @State private var name = ""\n    @State private var email = ""\n    @State private var password = ""\n    @State private var selection = ${JSON.stringify(a.items?.[0] ?? "Personal")}\n    @State private var tab = ${JSON.stringify(a.items?.[0] ?? "Overview")}\n\n    var body: some View {\n        VStack(alignment: .leading, spacing: ${a.spacing ?? (a.compact ? 10 : 16)}) {\n${(
+      (a.title ? `Text(${JSON.stringify(a.title)}).font(.headline)\n` : "") +
+      (views[entry.pattern.id] ?? "")
+        .replace("$24", `$${a.amount ?? 24}`)
+        .replace('Text("128")', `Text("${a.amount ?? 128}")`)
     )
       .split("\n")
       .map((l) => `            ${l}`)
       .join(
         "\n",
-      )}\n        }\n        .padding(24)\n        .tint(Color(red: ${rgb[0]}, green: ${rgb[1]}, blue: ${rgb[2]}))\n        .preferredColorScheme(.${a.dark ? "dark" : "light"})\n    }\n}\n\n#Preview { ComponentDemo() }`;
+      )}\n        }\n        .padding(24)\n        .scaleEffect(${a.scale ?? 1})\n        .controlSize(.${a.compact ? "small" : "regular"})\n        .tint(Color(red: ${rgb[0]}, green: ${rgb[1]}, blue: ${rgb[2]}))\n        .preferredColorScheme(.${a.dark ? "dark" : "light"})\n    }\n}\n\n#Preview { ComponentDemo() }`;
   }
   const imports: Record<string, string> = {
     shadcn:
@@ -217,7 +228,7 @@ export function sourceFor(entry: Entry, a: Appearance): string {
   ]
     .filter(Boolean)
     .join("\n");
-  return `"use client";\n${states ? 'import { useState } from "react";\n' : ""}${used}\n\n${lib === "radix" ? "// Radix primitives are unstyled. Add your own component CSS.\n" : ""}export default function ComponentDemo() {\n${states}\n  return (\n    ${providerStart}<div style={{ display: "grid", gap: ${a.compact ? 10 : 16}, padding: 24 }}>\n${body
+  return `"use client";\n${states ? 'import { useState } from "react";\n' : ""}${used}\n\n${lib === "radix" ? "// Radix primitives are unstyled. Add your own component CSS.\n" : ""}export default function ComponentDemo() {\n${states}\n  return (\n    ${providerStart}<div style={{ display: "grid", gap: ${a.spacing ?? (a.compact ? 10 : 16)}, padding: 24 }}>\n${body
     .split("\n")
     .map((l) => `      ${l}`)
     .join("\n")}\n    </div>${providerEnd}\n  );\n}`;

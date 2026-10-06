@@ -59,9 +59,9 @@ export default function AntPreview(props: PreviewProps) {
     select: () => (
       <Select
         aria-label="Workspace"
-        defaultValue="Personal"
+        defaultValue={a.items?.[0] ?? "Personal"}
         style={{ width: "100%" }}
-        options={["Personal", "Team", "Studio"].map((value) => ({
+        options={(a.items ?? ["Personal", "Team", "Studio"]).map((value) => ({
           value,
           label: value,
         }))}
@@ -75,7 +75,7 @@ export default function AntPreview(props: PreviewProps) {
         block
         value={value}
         onChange={(v) => change(String(v))}
-        options={["Overview", "Activity", "Settings"]}
+        options={a.items ?? ["Overview", "Activity", "Settings"]}
       />
     ),
     alert: () => (
@@ -90,11 +90,13 @@ export default function AntPreview(props: PreviewProps) {
       <Collapse
         defaultActiveKey={["0"]}
         accordion
-        items={[
-          "Can I make it my own?",
-          "What’s included?",
-          "Where do I start?",
-        ].map((label, i) => ({
+        items={(
+          a.items ?? [
+            "Can I make it my own?",
+            "What’s included?",
+            "Where do I start?",
+          ]
+        ).map((label, i) => ({
           key: String(i),
           label,
           children: "Every detail is yours to explore and customize.",

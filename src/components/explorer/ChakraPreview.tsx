@@ -72,15 +72,18 @@ export default function ChakraPreview({
             </Switch.Root>
           )}
           {pattern === "tabs" && (
-            <Tabs.Root defaultValue="Overview" colorPalette="teal">
+            <Tabs.Root
+              defaultValue={a.items?.[0] ?? "Overview"}
+              colorPalette="teal"
+            >
               <Tabs.List>
-                {["Overview", "Activity", "Settings"].map((x) => (
+                {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
                   <Tabs.Trigger key={x} value={x}>
                     {x}
                   </Tabs.Trigger>
                 ))}
               </Tabs.List>
-              {["Overview", "Activity", "Settings"].map((x) => (
+              {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
                 <Tabs.Content key={x} value={x}>
                   {x}: your workspace at a glance.
                 </Tabs.Content>
@@ -88,7 +91,7 @@ export default function ChakraPreview({
             </Tabs.Root>
           )}
           {pattern === "progress" && (
-            <Progress.Root value={64} colorPalette="teal">
+            <Progress.Root value={a.value ?? 64} colorPalette="teal">
               <Progress.Label>Uploading your project</Progress.Label>
               <Progress.Track>
                 <Progress.Range />

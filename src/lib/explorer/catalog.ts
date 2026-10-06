@@ -1,3 +1,4 @@
+import { describedValues } from "./values";
 export const libraries = [
   {
     id: "shadcn",
@@ -537,6 +538,12 @@ export type Appearance = {
   compact: boolean;
   outline: boolean;
   label: string;
+  title?: string;
+  items?: string[];
+  value?: number;
+  amount?: number;
+  spacing?: number;
+  scale?: number;
 };
 const colors: Record<string, string> = {
   blue: "#2563eb",
@@ -569,6 +576,7 @@ export function appearance(query: string): Appearance {
         : undefined,
     compact: /\b(compact|small|dense|tiny)\b/.test(q),
     outline: /\b(outline|outlined|ghost)\b/.test(q),
+    ...describedValues(query),
     label: query.match(/["“]([^"”]{1,60})["”]/)?.[1] ?? "Continue",
   };
 }

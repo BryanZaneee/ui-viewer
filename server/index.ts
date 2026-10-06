@@ -34,10 +34,10 @@ async function interpret(query: string): Promise<Intent> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(requestFor(query)),
-    signal: AbortSignal.timeout(5000),
+    signal: AbortSignal.timeout(8000),
   });
   if (!response.ok) throw new Error("Decision service unavailable");
-  return parseIntent(await response.json());
+  return parseIntent(await response.json(), query);
 }
 const server = createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/api/health")
@@ -74,7 +74,7 @@ const server = createServer(async (req, res) => {
       return reply(res, 400, {
         error: "Describe a component in 3–300 characters",
       });
-    const cacheKey = query.toLowerCase();
+    const cacheKey = query;
     const saved = cache.get(cacheKey);
     if (saved && saved.until > Date.now()) return reply(res, 200, saved.intent);
     if (pending.has(cacheKey))

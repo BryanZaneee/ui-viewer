@@ -1,11 +1,17 @@
-import { useId, useState, type CSSProperties } from "react";
+import { useEffect, useId, useState, type CSSProperties } from "react";
 import type { PreviewProps } from "./PatternPreview";
 import "./daisy.css";
 export default function DaisyPreview({ pattern, appearance: a }: PreviewProps) {
   const id = useId();
   const [done, setDone] = useState(false);
-  const [tab, setTab] = useState("Overview");
-  const [value, setValue] = useState(64);
+  const [tab, setTab] = useState(a.items?.[0] ?? "Overview");
+  const [value, setValue] = useState(
+    a.value ?? (pattern === "rating" ? 80 : 64),
+  );
+  useEffect(
+    () => setValue(a.value ?? (pattern === "rating" ? 80 : 64)),
+    [a.value, pattern],
+  );
   return (
     <div
       data-theme={a.dark ? "dark" : "light"}
@@ -62,7 +68,8 @@ export default function DaisyPreview({ pattern, appearance: a }: PreviewProps) {
                 name={id}
                 aria-label={`${n} star${n === 1 ? "" : "s"}`}
                 className="mask mask-star-2 bg-orange-500"
-                defaultChecked={n === 4}
+                checked={n === Math.max(1, Math.round(value / 20))}
+                onChange={() => setValue(n * 20)}
               />
             ))}
           </div>
@@ -99,24 +106,24 @@ export default function DaisyPreview({ pattern, appearance: a }: PreviewProps) {
         </>
       )}
       {pattern === "accordion" &&
-        ["Make it yours", "What is included?", "Where do I start?"].map(
-          (x, i) => (
-            <details
-              className="collapse collapse-arrow bg-base-200"
-              key={x}
-              open={i === 0 ? true : undefined}
-            >
-              <summary className="collapse-title">{x}</summary>
-              <div className="collapse-content">
-                All the essentials for your next idea.
-              </div>
-            </details>
-          ),
-        )}
+        (
+          a.items ?? ["Make it yours", "What is included?", "Where do I start?"]
+        ).map((x, i) => (
+          <details
+            className="collapse collapse-arrow bg-base-200"
+            key={x}
+            open={i === 0 ? true : undefined}
+          >
+            <summary className="collapse-title">{x}</summary>
+            <div className="collapse-content">
+              All the essentials for your next idea.
+            </div>
+          </details>
+        ))}
       {pattern === "tabs" && (
         <>
           <div role="tablist" aria-label="Views" className="tabs tabs-box">
-            {["Overview", "Activity", "Settings"].map((x) => (
+            {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
               <button
                 role="tab"
                 aria-selected={tab === x}
@@ -148,11 +155,14 @@ export default function DaisyPreview({ pattern, appearance: a }: PreviewProps) {
             </tr>
           </thead>
           <tbody>
-            {[
-              ["Alex", "Designer"],
-              ["Sam", "Developer"],
-              ["Jordan", "Creator"],
-            ].map(([name, role]) => (
+            {(a.items
+              ? a.items.map((x) => [x, "Pending"])
+              : [
+                  ["Alex", "Designer"],
+                  ["Sam", "Developer"],
+                  ["Jordan", "Creator"],
+                ]
+            ).map(([name, role]) => (
               <tr key={name}>
                 <td>{name}</td>
                 <td>{role}</td>

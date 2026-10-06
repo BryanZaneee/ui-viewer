@@ -50,3 +50,36 @@ test("request limits expire and stay independent per client", () => {
   assert(limit.take("b", 2));
   assert(limit.take("a", 1001));
 });
+
+test("Jev copies bounded source spans verbatim into component content", () => {
+  const query =
+    "I need a checklist for my PC to get my RTX 3060, CPU, and motherboard";
+  const decision = (start: string, end: string) => ({
+    answers: {
+      pattern: { choice: "checkbox", confidence: 0.99 },
+      contentStart: { choice: start, confidence: 0.98 },
+      contentEnd: { choice: end, confidence: 0.98 },
+      color: { choice: "blue", confidence: 0.9 },
+    },
+  });
+  assert.deepEqual(parseIntent(decision("10", "14"), query).values, {
+    items: ["RTX 3060", "CPU", "motherboard"],
+    color: "#2563eb",
+  });
+  for (const [start, end] of [
+    ["14", "10"],
+    ["-1", "14"],
+    ["10", "500"],
+    ["10x", "14"],
+  ]) {
+    assert.equal(
+      parseIntent(decision(start, end), query).values?.items,
+      undefined,
+    );
+  }
+  const injection = decision("10", "14");
+  injection.answers.color.choice = "javascript:alert(1)";
+  assert.equal(parseIntent(injection, query).values?.color, undefined);
+  injection.answers.pattern.choice = "none";
+  assert.equal(parseIntent(injection, query).values, undefined);
+});

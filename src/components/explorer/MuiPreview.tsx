@@ -87,11 +87,11 @@ export default function MuiPreview(props: PreviewProps) {
       <TextField
         select
         label="Workspace"
-        defaultValue="Personal"
+        defaultValue={a.items?.[0] ?? "Personal"}
         size="small"
         fullWidth
       >
-        {["Personal", "Team", "Studio"].map((x) => (
+        {(a.items ?? ["Personal", "Team", "Studio"]).map((x) => (
           <MenuItem value={x} key={x}>
             {x}
           </MenuItem>
@@ -113,7 +113,7 @@ export default function MuiPreview(props: PreviewProps) {
         variant="fullWidth"
         aria-label="Views"
       >
-        {["Overview", "Activity", "Settings"].map((x) => (
+        {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
           <Tab
             sx={{ minWidth: 0, padding: "8px", fontSize: 12 }}
             value={x}
@@ -130,23 +130,27 @@ export default function MuiPreview(props: PreviewProps) {
     ),
     accordion: () => (
       <div>
-        {["Can I make it my own?", "What’s included?", "Where do I start?"].map(
-          (x, i) => (
-            <Accordion
-              key={x}
-              defaultExpanded={i === 0}
-              disableGutters
-              elevation={0}
-            >
-              <AccordionSummary expandIcon={<ChevronDown size={15} />}>
-                {x}
-              </AccordionSummary>
-              <AccordionDetails>
-                Every detail is yours to explore and customize.
-              </AccordionDetails>
-            </Accordion>
-          ),
-        )}
+        {(
+          a.items ?? [
+            "Can I make it my own?",
+            "What’s included?",
+            "Where do I start?",
+          ]
+        ).map((x, i) => (
+          <Accordion
+            key={x}
+            defaultExpanded={i === 0}
+            disableGutters
+            elevation={0}
+          >
+            <AccordionSummary expandIcon={<ChevronDown size={15} />}>
+              {x}
+            </AccordionSummary>
+            <AccordionDetails>
+              Every detail is yours to explore and customize.
+            </AccordionDetails>
+          </Accordion>
+        ))}
       </div>
     ),
   };

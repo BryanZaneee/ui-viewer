@@ -4,6 +4,11 @@ const sources = import.meta.glob("../../components/explorer/*Preview.tsx", {
   import: "default",
 });
 const names: Record<string, string> = {
+  shadcn: "Web",
+  radix: "Web",
+  mui: "Mui",
+  mantine: "Mantine",
+  antd: "Ant",
   heroui: "Hero",
   daisyui: "Daisy",
   magicui: "Magic",
@@ -21,7 +26,13 @@ export async function previewSource(
   if (name) {
     const source =
       await sources[`../../components/explorer/${name}Preview.tsx`]();
-    return `// Actual UI Viewer preview adapter. Shared types and CSS are in the repository.\n// Render with pattern=${JSON.stringify(entry.pattern.id)} and appearance=${JSON.stringify(a)}\n\n${source}`;
+    const usage = `<${name}Preview${name === "Web" ? ` library="${entry.library.id}"` : ""}\n  pattern="${entry.pattern.id}"\n  appearance={${JSON.stringify(a, null, 2)}}\n/>`;
+    return `// Your configured component (shared types, renderer and CSS are in UI Viewer).\n${usage
+      .split("\n")
+      .map((line) => `// ${line}`)
+      .join(
+        "\n",
+      )}\n\n// Adapter implementation: src/components/explorer/${name}Preview.tsx\n${source}`;
   }
   if (entry.library.id === "reactbits" || entry.library.id === "aceternity")
     return `Reference only.\n\nExplore ${entry.library.docs}\n\nSource is not redistributed here. Check the creator’s current license before incorporating components.`;

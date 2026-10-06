@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { Marquee } from "@/components/magicui/marquee";
 import { AuroraText } from "@/components/magicui/aurora-text";
@@ -6,7 +6,8 @@ import { NumberTicker } from "@/components/magicui/number-ticker";
 import type { PreviewProps } from "./PatternPreview";
 import "./magic.css";
 export default function MagicPreview({ pattern, appearance: a }: PreviewProps) {
-  const [count, setCount] = useState(1280);
+  const [count, setCount] = useState(a.amount ?? 1280);
+  useEffect(() => setCount(a.amount ?? 1280), [a.amount]);
   const reduced = useReducedMotion();
   return (
     <div className="demo-stack demo-center magic-demo">
@@ -14,18 +15,20 @@ export default function MagicPreview({ pattern, appearance: a }: PreviewProps) {
         <>
           <span className="demo-eyebrow">YOUR NEXT IDEA STARTS HERE</span>
           <Marquee pauseOnHover repeat={2}>
-            {["Design", "Build", "Explore", "Create"].map((x) => (
+            {(a.items ?? ["Design", "Build", "Explore", "Create"]).map((x) => (
               <span key={x} className="magic-chip">
                 {x}
               </span>
             ))}
           </Marquee>
           <Marquee reverse pauseOnHover repeat={2}>
-            {["Buttons", "Cards", "Motion", "Possibilities"].map((x) => (
-              <span key={x} className="magic-chip">
-                {x}
-              </span>
-            ))}
+            {(a.items ?? ["Buttons", "Cards", "Motion", "Possibilities"]).map(
+              (x) => (
+                <span key={x} className="magic-chip">
+                  {x}
+                </span>
+              ),
+            )}
           </Marquee>
           <span className="demo-muted">Hover to pause</span>
         </>

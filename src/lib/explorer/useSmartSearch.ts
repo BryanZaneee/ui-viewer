@@ -1,20 +1,19 @@
+import { validAppearance } from "./values";
+import { appearance } from "./catalog";
 import { useEffect, useState } from "react";
-import { patterns, type Pattern } from "./catalog";
+import { patterns, type Appearance, type Pattern } from "./catalog";
 type Result = {
   query: string;
   pattern: Pattern | null;
+  values?: Partial<Appearance>;
   status: "matching" | "matched" | "local";
 };
-const cache = new Map<string, Pattern | null>();
+const cache = new Map<
+  string,
+  { pattern: Pattern | null; values?: Partial<Appearance> }
+>();
 export function useSmartSearch(query: string) {
   const [available, setAvailable] = useState(false);
-  const [enabled, setEnabled] = useState(() => {
-    try {
-      return localStorage.getItem("ui-viewer-smart") !== "off";
-    } catch {
-      return true;
-    }
-  });
   const [result, setResult] = useState<Result>({
     query: "",
     pattern: null,
@@ -31,11 +30,11 @@ export function useSmartSearch(query: string) {
     return () => controller.abort();
   }, []);
   useEffect(() => {
-    if (!available || !enabled || query.trim().length < 3) return;
+    if (!available || query.trim().length < 3) return;
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       if (cache.has(query)) {
-        setResult({ query, pattern: cache.get(query)!, status: "matched" });
+        setResult({ query, ...cache.get(query)!, status: "matched" });
         return;
       }
       setResult({ query, pattern: null, status: "matching" });
@@ -48,7 +47,7 @@ export function useSmartSearch(query: string) {
             body: JSON.stringify({ query }),
             signal: AbortSignal.any([
               controller.signal,
-              AbortSignal.timeout(6000),
+              AbortSignal.timeout(9000),
             ]),
           },
         );
@@ -57,8 +56,12 @@ export function useSmartSearch(query: string) {
         const pattern = patterns.find((p) => p.id === data.pattern)?.id ?? null;
         if (controller.signal.aborted) return;
         if (cache.size >= 100) cache.delete(cache.keys().next().value!);
-        cache.set(query, pattern);
-        setResult({ query, pattern, status: "matched" });
+        const values =
+          data.values && validAppearance({ ...appearance(""), ...data.values })
+            ? (data.values as Partial<Appearance>)
+            : undefined;
+        cache.set(query, { pattern, values });
+        setResult({ query, pattern, values, status: "matched" });
       } catch {
         if (!controller.signal.aborted)
           setResult({ query, pattern: null, status: "local" });
@@ -68,21 +71,11 @@ export function useSmartSearch(query: string) {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [query, enabled, available]);
+  }, [query, available]);
   return {
     available,
-    enabled,
-    toggle: () => {
-      setEnabled((v) => {
-        try {
-          localStorage.setItem("ui-viewer-smart", v ? "off" : "on");
-        } catch {
-          /* Storage is optional. */
-        }
-        return !v;
-      });
-    },
-    pattern: enabled && result.query === query ? result.pattern : null,
-    status: enabled && result.query === query ? result.status : "local",
+    pattern: result.query === query ? result.pattern : null,
+    values: result.query === query ? result.values : undefined,
+    status: result.query === query ? result.status : "local",
   };
 }

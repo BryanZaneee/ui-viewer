@@ -1,3 +1,4 @@
+import { validAppearance } from "./lib/explorer/values";
 import {
   Component,
   lazy,
@@ -8,12 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  appearance,
-  catalog,
-  type Appearance,
-  type Library,
-} from "./lib/explorer/catalog";
+import { appearance, catalog, type Library } from "./lib/explorer/catalog";
 import type { PreviewProps } from "./components/explorer/PatternPreview";
 import "./base.css";
 import "./components/explorer/explorer.css";
@@ -52,20 +48,6 @@ class PreviewError extends Component<
     );
   }
 }
-function validAppearance(value: unknown): value is Appearance {
-  if (!value || typeof value !== "object") return false;
-  const a = value as Appearance;
-  return (
-    typeof a.color === "string" &&
-    (a.color === "" || /^#[a-f\d]{6}$/i.test(a.color)) &&
-    typeof a.dark === "boolean" &&
-    typeof a.compact === "boolean" &&
-    typeof a.outline === "boolean" &&
-    typeof a.label === "string" &&
-    a.label.length <= 60 &&
-    (a.radius === undefined || a.radius === 0 || a.radius === 24)
-  );
-}
 function App() {
   const entry = catalog.find(
     (e) => e.id === new URLSearchParams(location.search).get("entry"),
@@ -92,7 +74,7 @@ function App() {
   const style = {
     "--demo-accent": a.color || entry.library.color,
     "--demo-radius": `${a.radius ?? (library === "swiftui" ? 12 : 6)}px`,
-    "--demo-space": a.compact ? "10px" : "16px",
+    "--demo-space": `${a.spacing ?? (a.compact ? 10 : 16)}px`,
     "--accent": a.color || entry.library.color,
     colorScheme: a.dark ? "dark" : "light",
   } as CSSProperties;
@@ -104,15 +86,16 @@ function App() {
       data-outline={a.outline}
       style={style}
     >
-      <div className="preview-inner">
+      <div className="preview-inner" style={{ zoom: a.scale ?? 1 }}>
+        {a.title && <h2 className="preview-custom-title">{a.title}</h2>}
         <PreviewError>
           <Suspense fallback={<div role="status">Loading library…</div>}>
             {library === "shadcn" ||
             library === "radix" ||
             library === "swiftui" ? (
-              <Web {...props} library={library} />
+              <Web key={JSON.stringify(a.items)} {...props} library={library} />
             ) : Adapter ? (
-              <Adapter {...props} />
+              <Adapter key={JSON.stringify(a.items)} {...props} />
             ) : (
               <p>Visit the original component library.</p>
             )}

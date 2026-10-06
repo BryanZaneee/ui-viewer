@@ -1,31 +1,19 @@
 # Validation
 
-Validated on 2026-10-06 with Node 26.8.1 and Chromium.
+Validated on 2026-10-06. Production checks ran with Node 22 on the VPS in an isolated temporary directory; browser checks ran in Chromium locally.
 
-- Typecheck, catalog/search checks, legacy TSX starter parsing, Jev response validation, and rate-limit tests pass.
-- All 139 interactive catalog entries rendered in the production build without a runtime error.
-- Live color changes preserve mounted component state; favorites survive reloads.
-- Calendar navigation, autocomplete selection, HeroUI switch interaction, Radix Themes dialogs, source inspection, and reference links work.
-- Mobile viewport at 390×844 has no horizontal overflow.
-- Axe WCAG 2 A/AA and 2.1 AA scan of the catalog shell returned no violations. This is not a certification of every upstream component.
-- Jev selected calendar, rating, table, aurora text, login, and none correctly for six representative descriptions. Observed response times were 276–483 ms; this small sample is not a latency guarantee or broad accuracy benchmark.
-- API validation rejects oversized/invalid descriptions and disallowed origins. Repeated queries use the response cache.
-- Smart-search opt-out persists; local results work when the service responds 503.
+- `npm run check`: TypeScript, nine catalog/source/value/Jev tests, static build, and server build pass.
+- All 139 interactive entries render without a runtime error (`npm run test:previews`).
+- `npm run test:editor`: automatic Jev matching, PC checklist content, library-filter placement, sidebar toggle, animated expansion, source updates, item editing/removal, keyboard sliders, color, heading, randomization, reset, and Escape/Enter behavior pass.
+- Mounted checkbox state survives styling changes. Randomize preserves supplied content. Each card maintains independent overrides for the current query.
+- Mobile at 390×844 has no horizontal page overflow. The sidebar starts collapsed on small screens; the expanded editor uses the page's scroll on mobile. Reduced-motion preferences are respected.
+- Axe WCAG 2 A/AA and 2.1 AA scan of the expanded catalog/editor returned zero violations. This does not certify every upstream library component.
+- Source spans preserve exact spelling/case; malformed, reversed, out-of-range, low-confidence, and unknown decisions cannot become component data. Numeric styles and frame messages have bounded validation.
+- The exact request `I need a checklist for my PC to get my RTX 3060, CPU, and motherboard` returns `checkbox` with items `RTX 3060`, `CPU`, `motherboard`. Grocery-list, pricing, and percentage requests also passed live Jev checks. Four sampled calls took 221–437 ms; this is not a general accuracy or latency guarantee.
+- API keys remain in a root-owned mode-600 environment file outside the repository and web root. Source and browser/server build artifacts were scanned for OpenRouter key literals before publishing.
 
-Run `npm run check`, then serve the production build and run `npm run test:previews`.
-`npm run bundle` reports the actual compressed shell footprint; visible library
-previews are additional lazy requests.
+The shell is approximately 146 KiB gzip, excluding lazy library previews. The bundled search service is approximately 22 KiB uncompressed. The existing motion dependency supplies layout animations; no new library dependency was added.
 
-## Live deployment
+React source panels show the current configuration and actual adapter implementation. Shared renderer/types/styles remain repository dependencies. SwiftUI is a browser approximation with a native starter; native Xcode compilation is not part of these checks.
 
-The public repository is a fresh, public GitHub repository rather than a fork.
-The live app at https://bryanzane.com/ui-viewer/ passed browser checks for Jev
-description matching and interactive library previews. The original portfolio
-and Shapeshift routes both still return HTTP 200. HTML responses bypass CDN
-caching, and the preview endpoint permits same-origin embedding via CSP.
-
-The final shell measures 125.7 KiB gzip excluding visible library modules.
-The bundled search server is 16.7 KiB uncompressed. Credentials are held in a
-root-owned mode-600 environment file outside the repository and web root.
-Staged files were scanned before publishing; no OpenRouter keys or environment
-files were included. Temporary local credential files were removed after testing.
+Use `UI_VIEWER_URL` to point browser scripts at a local preview or the live app. Editor tests need the Jev service; catalog rendering checks do not.

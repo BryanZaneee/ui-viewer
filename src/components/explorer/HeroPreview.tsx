@@ -68,16 +68,16 @@ export default function HeroPreview({ pattern, appearance: a }: PreviewProps) {
         </div>
       )}
       {pattern === "tabs" && (
-        <Tabs defaultSelectedKey="Overview">
+        <Tabs defaultSelectedKey={a.items?.[0] ?? "Overview"}>
           <Tabs.List aria-label="Views">
-            {["Overview", "Activity", "Settings"].map((x) => (
+            {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
               <Tabs.Tab id={x} key={x}>
                 {x}
                 <Tabs.Indicator />
               </Tabs.Tab>
             ))}
           </Tabs.List>
-          {["Overview", "Activity", "Settings"].map((x) => (
+          {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
             <Tabs.Panel id={x} key={x}>
               {x}: your workspace at a glance.
             </Tabs.Panel>
@@ -86,24 +86,28 @@ export default function HeroPreview({ pattern, appearance: a }: PreviewProps) {
       )}
       {pattern === "accordion" && (
         <Accordion>
-          {["Make it yours", "What is included?", "Where do I start?"].map(
-            (x) => (
-              <Accordion.Item id={x} key={x}>
-                <Accordion.Heading>
-                  <Accordion.Trigger>
-                    {x}
-                    <Accordion.Indicator />
-                  </Accordion.Trigger>
-                </Accordion.Heading>
-                <Accordion.Panel>
-                  <Accordion.Body>
-                    Choose a component, change the details, and bring it to your
-                    next project.
-                  </Accordion.Body>
-                </Accordion.Panel>
-              </Accordion.Item>
-            ),
-          )}
+          {(
+            a.items ?? [
+              "Make it yours",
+              "What is included?",
+              "Where do I start?",
+            ]
+          ).map((x) => (
+            <Accordion.Item id={x} key={x}>
+              <Accordion.Heading>
+                <Accordion.Trigger>
+                  {x}
+                  <Accordion.Indicator />
+                </Accordion.Trigger>
+              </Accordion.Heading>
+              <Accordion.Panel>
+                <Accordion.Body>
+                  Choose a component, change the details, and bring it to your
+                  next project.
+                </Accordion.Body>
+              </Accordion.Panel>
+            </Accordion.Item>
+          ))}
         </Accordion>
       )}
     </div>

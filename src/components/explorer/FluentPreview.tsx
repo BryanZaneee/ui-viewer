@@ -23,7 +23,7 @@ export default function FluentPreview({
   appearance: a,
 }: PreviewProps) {
   const [done, setDone] = useState(false);
-  const [tab, setTab] = useState("Overview");
+  const [tab, setTab] = useState(a.items?.[0] ?? "Overview");
   const theme = {
     ...(a.dark ? webDarkTheme : webLightTheme),
     ...(a.color
@@ -66,7 +66,7 @@ export default function FluentPreview({
               selectedValue={tab}
               onTabSelect={(_, data) => setTab(String(data.value))}
             >
-              {["Overview", "Activity", "Settings"].map((x) => (
+              {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
                 <Tab key={x} value={x}>
                   {x}
                 </Tab>
@@ -76,8 +76,14 @@ export default function FluentPreview({
           </>
         )}
         {pattern === "progress" && (
-          <Field validationMessage="64% uploaded" validationState="none">
-            <ProgressBar value={0.64} aria-label="Project upload" />
+          <Field
+            validationMessage={`${a.value ?? 64}% uploaded`}
+            validationState="none"
+          >
+            <ProgressBar
+              value={(a.value ?? 64) / 100}
+              aria-label="Project upload"
+            />
           </Field>
         )}
         {pattern === "badge" && (
@@ -95,11 +101,13 @@ export default function FluentPreview({
               </MenuTrigger>
               <MenuPopover>
                 <MenuList>
-                  {["Edit project", "Duplicate", "Archive"].map((x) => (
-                    <MenuItem key={x} onClick={() => setDone(true)}>
-                      {x}
-                    </MenuItem>
-                  ))}
+                  {(a.items ?? ["Edit project", "Duplicate", "Archive"]).map(
+                    (x) => (
+                      <MenuItem key={x} onClick={() => setDone(true)}>
+                        {x}
+                      </MenuItem>
+                    ),
+                  )}
                 </MenuList>
               </MenuPopover>
             </Menu>

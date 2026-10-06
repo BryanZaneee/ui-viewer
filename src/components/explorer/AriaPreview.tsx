@@ -1,3 +1,4 @@
+import { defaultItems } from "@/lib/explorer/values";
 import { useState } from "react";
 import {
   Button,
@@ -66,11 +67,13 @@ export default function AriaPreview({ pattern, appearance: a }: PreviewProps) {
           </div>
           <Popover>
             <ListBox>
-              {["React", "Vue", "Svelte", "Angular", "Solid"].map((x) => (
-                <ListBoxItem key={x} id={x}>
-                  {x}
-                </ListBoxItem>
-              ))}
+              {(a.items ?? ["React", "Vue", "Svelte", "Angular", "Solid"]).map(
+                (x) => (
+                  <ListBoxItem key={x} id={x}>
+                    {x}
+                  </ListBoxItem>
+                ),
+              )}
             </ListBox>
           </Popover>
         </ComboBox>
@@ -84,7 +87,7 @@ export default function AriaPreview({ pattern, appearance: a }: PreviewProps) {
         </Switch>
       )}
       {pattern === "slider" && (
-        <Slider defaultValue={64}>
+        <Slider key={a.value} defaultValue={a.value ?? 64}>
           <div className="demo-row between">
             <Label>Volume</Label>
             <SliderOutput />
@@ -95,11 +98,7 @@ export default function AriaPreview({ pattern, appearance: a }: PreviewProps) {
         </Slider>
       )}
       {pattern === "checkbox" &&
-        [
-          "Explore the possibilities",
-          "Make it your own",
-          "Ship something great",
-        ].map((x, i) => (
+        (a.items ?? defaultItems).map((x, i) => (
           <Checkbox key={x} defaultSelected={i === 0}>
             <span className="aria-check">✓</span>
             {x}
@@ -108,13 +107,13 @@ export default function AriaPreview({ pattern, appearance: a }: PreviewProps) {
       {pattern === "tabs" && (
         <Tabs>
           <TabList aria-label="Views">
-            {["Overview", "Activity", "Settings"].map((x) => (
+            {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
               <Tab key={x} id={x}>
                 {x}
               </Tab>
             ))}
           </TabList>
-          {["Overview", "Activity", "Settings"].map((x) => (
+          {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
             <TabPanel key={x} id={x}>
               {x}: your workspace at a glance.
             </TabPanel>

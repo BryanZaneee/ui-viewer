@@ -64,15 +64,15 @@ export default function ThemesPreview({
           </label>
         )}
         {pattern === "tabs" && (
-          <Tabs.Root defaultValue="Overview">
+          <Tabs.Root defaultValue={a.items?.[0] ?? "Overview"}>
             <Tabs.List>
-              {["Overview", "Activity", "Settings"].map((x) => (
+              {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
                 <Tabs.Trigger key={x} value={x}>
                   {x}
                 </Tabs.Trigger>
               ))}
             </Tabs.List>
-            {["Overview", "Activity", "Settings"].map((x) => (
+            {(a.items ?? ["Overview", "Activity", "Settings"]).map((x) => (
               <Tabs.Content key={x} value={x} style={{ paddingTop: 20 }}>
                 {x}: your workspace at a glance.
               </Tabs.Content>
@@ -88,11 +88,14 @@ export default function ThemesPreview({
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {[
-                ["Alex", "Designer"],
-                ["Sam", "Developer"],
-                ["Jordan", "Creator"],
-              ].map(([name, role]) => (
+              {(a.items
+                ? a.items.map((x) => [x, "Pending"])
+                : [
+                    ["Alex", "Designer"],
+                    ["Sam", "Developer"],
+                    ["Jordan", "Creator"],
+                  ]
+              ).map(([name, role]) => (
                 <Table.Row key={name}>
                   <Table.RowHeaderCell>{name}</Table.RowHeaderCell>
                   <Table.Cell>{role}</Table.Cell>
@@ -108,11 +111,13 @@ export default function ThemesPreview({
                 <Button variant="soft">Project actions ▾</Button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Content>
-                {["Edit project", "Duplicate", "Archive"].map((x) => (
-                  <DropdownMenu.Item key={x} onSelect={() => setDone(true)}>
-                    {x}
-                  </DropdownMenu.Item>
-                ))}
+                {(a.items ?? ["Edit project", "Duplicate", "Archive"]).map(
+                  (x) => (
+                    <DropdownMenu.Item key={x} onSelect={() => setDone(true)}>
+                      {x}
+                    </DropdownMenu.Item>
+                  ),
+                )}
               </DropdownMenu.Content>
             </DropdownMenu.Root>
             {done && <span role="status">Action selected</span>}

@@ -17,3 +17,12 @@ The shell is approximately 146 KiB gzip, excluding lazy library previews. The bu
 React source panels show the current configuration and actual adapter implementation. Shared renderer/types/styles remain repository dependencies. SwiftUI is a browser approximation with a native starter; native Xcode compilation is not part of these checks.
 
 Use `UI_VIEWER_URL` to point browser scripts at a local preview or the live app. Editor tests need the Jev service; catalog rendering checks do not.
+
+## Live verification
+
+Release `20261006-205154` is live at https://bryanzane.com/ui-viewer/.
+The complete editor flow passed again against the public site, including Jev's
+exact PC checklist extraction and mobile layout. Preview responses return
+`X-Frame-Options: SAMEORIGIN`, a same-origin framing CSP, and `no-store` with
+Cloudflare `DYNAMIC`. The portfolio and original Shapeshift route return 200.
+Temporary local credentials and isolated VPS build files were removed afterward.

@@ -91,6 +91,10 @@ try {
     .getByRole("region", { name: "Customize component" })
     .waitFor({ state: "detached" });
   await search.fill('blue buttons "Build PC"');
+  await first
+    .frameLocator("iframe")
+    .getByRole("button", { name: "Build PC", exact: true })
+    .waitFor();
   await first.locator(".preview-open").click();
   await first.getByRole("slider", { name: "Corners" }).press("End");
   await first
@@ -99,6 +103,10 @@ try {
     .waitFor();
   await search.fill("progress at 72% gap 8px");
   const progress = page.locator(".component-tile").first();
+  await progress
+    .frameLocator("iframe")
+    .getByText("72%", { exact: true })
+    .waitFor();
   await progress.locator(".preview-open").click();
   await progress.getByRole("slider", { name: "Value" }).press("Home");
   await progress.getByRole("slider", { name: "Value" }).press("ArrowRight");

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { patterns, type Appearance, type Pattern } from "./catalog";
 type Result = {
   query: string;
+  displayQuery: string;
   pattern: Pattern | null;
   values?: Partial<Appearance>;
   status: "matching" | "matched" | "local";
@@ -13,31 +14,49 @@ const cache = new Map<
   { pattern: Pattern | null; values?: Partial<Appearance> }
 >();
 export function useSmartSearch(query: string) {
-  const [available, setAvailable] = useState(false);
+  const [available, setAvailable] = useState<boolean | null>(null);
   const [result, setResult] = useState<Result>({
     query: "",
+    displayQuery: "",
     pattern: null,
     status: "local",
   });
   useEffect(() => {
     const controller = new AbortController();
     fetch(`${import.meta.env.BASE_URL}api/health`, {
-      signal: controller.signal,
+      signal: AbortSignal.any([controller.signal, AbortSignal.timeout(4000)]),
     })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => setAvailable(data?.available === true))
-      .catch(() => {});
+      .catch(() => {
+        if (!controller.signal.aborted) setAvailable(false);
+      });
     return () => controller.abort();
   }, []);
   useEffect(() => {
-    if (!available || query.trim().length < 3) return;
+    if (!query.trim()) {
+      setResult({
+        query: "",
+        displayQuery: "",
+        pattern: null,
+        status: "local",
+      });
+      return;
+    }
+    if (available !== true || query.trim().length < 3) return;
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       if (cache.has(query)) {
-        setResult({ query, ...cache.get(query)!, status: "matched" });
+        setResult({
+          query,
+          displayQuery: query,
+          ...cache.get(query)!,
+          status: "matched",
+        });
         return;
       }
-      setResult({ query, pattern: null, status: "matching" });
+      // Keep the last completed preview intact through debounce and network work.
+      setResult((previous) => ({ ...previous, query, status: "matching" }));
       try {
         const response = await fetch(
           `${import.meta.env.BASE_URL}api/interpret`,
@@ -61,10 +80,20 @@ export function useSmartSearch(query: string) {
             ? (data.values as Partial<Appearance>)
             : undefined;
         cache.set(query, { pattern, values });
-        setResult({ query, pattern, values, status: "matched" });
+        setResult({
+          query,
+          displayQuery: query,
+          pattern,
+          values,
+          status: "matched",
+        });
       } catch {
         if (!controller.signal.aborted)
-          setResult({ query, pattern: null, status: "local" });
+          setResult((previous) =>
+            previous.displayQuery
+              ? { ...previous, query, status: "local" }
+              : { query, displayQuery: query, pattern: null, status: "local" },
+          );
       }
     }, 450);
     return () => {
@@ -72,10 +101,15 @@ export function useSmartSearch(query: string) {
       controller.abort();
     };
   }, [query, available]);
+  const local = available === false || !query.trim();
   return {
     available,
-    pattern: result.query === query ? result.pattern : null,
-    values: result.query === query ? result.values : undefined,
-    status: result.query === query ? result.status : "local",
+    query: local ? query : result.displayQuery,
+    pattern: local ? null : result.pattern,
+    values: local ? undefined : result.values,
+    pending:
+      !local &&
+      query.trim().length >= 3 &&
+      (result.query !== query || result.status === "matching"),
   };
 }

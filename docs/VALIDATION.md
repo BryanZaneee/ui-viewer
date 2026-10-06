@@ -26,3 +26,18 @@ exact PC checklist extraction and mobile layout. Preview responses return
 `X-Frame-Options: SAMEORIGIN`, a same-origin framing CSP, and `no-store` with
 Cloudflare `DYNAMIC`. The portfolio and original Shapeshift route return 200.
 Temporary local credentials and isolated VPS build files were removed afterward.
+
+## Search continuity
+
+The repository now lives at `~/programming-projects/ui-viewer`. The search input
+keeps the last completed query, content, and styling together until the next
+response is ready. Embedded frames wait for actual props before rendering.
+
+- `npm run check` passes from the relocated checkout.
+- `npm run test:search` verifies first-search loading, debounce and delayed
+  responses, preserved iframe identity, stale-response rejection, cache hits,
+  temporary failures, clearing during a request, and no transient sample text.
+- All 139 interactive previews pass after the embedded-frame initialization change.
+- Release `20261006-220329` is live. Search continuity and the full editor flow
+  both pass against the public site, including actual server-side Jev content.
+  The server implementation and private environment were unchanged.

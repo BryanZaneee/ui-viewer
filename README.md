@@ -30,14 +30,18 @@ npm run preview     # Serve the static production build
 npm run bundle      # Measure compressed shell assets
 npm run test:previews # Check all previews with the preview server running
 npm run test:editor   # Exercise the editor with a running preview and Jev service
+npm run test:search   # Regression check with controlled slow/stale search responses
 ```
 
 ## Usage
 
 Type `rounded blue buttons "Launch"`, `React Aria calendar`, or
 `I need a checklist for my PC to get my RTX 3060, CPU, and motherboard`.
-Local matches and explicit values update on each keystroke. After a short pause,
-Jev automatically identifies the component type, requested content, and styling.
+The search field updates immediately. After a short pause, Jev identifies the
+component type, requested content, and styling, then updates the previews together.
+The last completed preview stays visible while typing or waiting for a response;
+new preview frames wait for their actual values before rendering. Clearing search
+resets the catalog immediately. Without Jev, local matching remains immediate.
 Library filters sit directly below search; the compact category sidebar can be
 collapsed. No search toggle or suggestion row is required.
 

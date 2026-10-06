@@ -9,7 +9,12 @@ import {
   type ReactNode,
 } from "react";
 import { createRoot } from "react-dom/client";
-import { appearance, catalog, type Library } from "./lib/explorer/catalog";
+import {
+  appearance,
+  catalog,
+  type Appearance,
+  type Library,
+} from "./lib/explorer/catalog";
 import type { PreviewProps } from "./components/explorer/PatternPreview";
 import "./base.css";
 import "./components/explorer/explorer.css";
@@ -52,7 +57,9 @@ function App() {
   const entry = catalog.find(
     (e) => e.id === new URLSearchParams(location.search).get("entry"),
   );
-  const [a, setA] = useState(() => appearance(""));
+  const [a, setA] = useState<Appearance | null>(() =>
+    window.parent === window ? appearance("") : null,
+  );
   useEffect(() => {
     const receive = (event: MessageEvent) => {
       if (
@@ -68,6 +75,13 @@ function App() {
     return () => window.removeEventListener("message", receive);
   }, []);
   if (!entry) return <p role="alert">Component not found.</p>;
+  // Embedded previews wait for their real props instead of painting sample data.
+  if (!a)
+    return (
+      <div className="frame-placeholder" role="status">
+        Loading preview…
+      </div>
+    );
   const library: Library = entry.library.id;
   const Adapter = adapters[library];
   const props: PreviewProps = { pattern: entry.pattern.id, appearance: a };

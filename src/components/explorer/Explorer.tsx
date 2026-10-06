@@ -103,6 +103,8 @@ export function Explorer() {
   const params = useMemo(() => new URLSearchParams(search), [search]);
   const query = params.get("q") || "";
   const smart = useSmartSearch(query);
+  const previewQuery = smart.query;
+  const preparing = smart.pending && !previewQuery;
   const library = libraries.some((l) => l.id === params.get("library"))
     ? params.get("library")!
     : "all";
@@ -120,24 +122,31 @@ export function Explorer() {
   const input = useRef<HTMLInputElement>(null);
   const look = useMemo(
     () => ({
-      ...appearance(query),
+      ...appearance(previewQuery),
       ...smart.values,
-      ...describedValues(query),
+      ...describedValues(previewQuery),
     }),
-    [query, smart.values],
+    [previewQuery, smart.values],
   );
   const results = useMemo(() => {
-    const found = searchCatalog(query, library, category, smart.pattern).filter(
-      (e) => !savedOnly || saved.includes(e.id),
-    );
-    if (!query.trim() && library === "all" && category === "All components")
+    const found = searchCatalog(
+      previewQuery,
+      library,
+      category,
+      smart.pattern,
+    ).filter((e) => !savedOnly || saved.includes(e.id));
+    if (
+      !previewQuery.trim() &&
+      library === "all" &&
+      category === "All components"
+    )
       found.sort((a, b) => {
         const ai = featured.indexOf(a.id),
           bi = featured.indexOf(b.id);
         return (ai < 0 ? 100 : ai) - (bi < 0 ? 100 : bi);
       });
     return found;
-  }, [query, library, category, savedOnly, saved, smart.pattern]);
+  }, [previewQuery, library, category, savedOnly, saved, smart.pattern]);
   const change = (values: Record<string, string>) => {
     setSelected(null);
     updateURL(values);
@@ -313,6 +322,7 @@ export function Explorer() {
               className="results-section"
               id="component-results"
               aria-label="Component results"
+              aria-busy={smart.pending}
             >
               <div className="results-heading">
                 <div>
@@ -344,21 +354,33 @@ export function Explorer() {
                 </button>
               </div>
               <div className="component-grid">
-                {results.slice(0, limit).map((entry) => (
-                  <ComponentCard
-                    key={entry.id}
-                    entry={entry}
-                    appearance={look}
-                    query={query}
-                    expanded={selected === entry.id}
-                    onExpand={() => setSelected(entry.id)}
-                    onClose={() => setSelected(null)}
-                    saved={saved.includes(entry.id)}
-                    onSave={() => toggleSaved(entry.id)}
-                  />
-                ))}
+                {preparing ? (
+                  <div
+                    className="empty-results"
+                    role="status"
+                    style={{ gridColumn: "1 / -1" }}
+                  >
+                    Preparing your components…
+                  </div>
+                ) : (
+                  results
+                    .slice(0, limit)
+                    .map((entry) => (
+                      <ComponentCard
+                        key={entry.id}
+                        entry={entry}
+                        appearance={look}
+                        query={previewQuery}
+                        expanded={selected === entry.id}
+                        onExpand={() => setSelected(entry.id)}
+                        onClose={() => setSelected(null)}
+                        saved={saved.includes(entry.id)}
+                        onSave={() => toggleSaved(entry.id)}
+                      />
+                    ))
+                )}
               </div>
-              {!results.length && (
+              {!preparing && !results.length && (
                 <div className="empty-results">
                   <Search size={30} />
                   <h3>
@@ -380,7 +402,7 @@ export function Explorer() {
                   </button>
                 </div>
               )}
-              {results.length > limit && (
+              {!preparing && results.length > limit && (
                 <button
                   className="load-more"
                   onClick={() => setLimit((v) => v + 6)}

@@ -37,11 +37,10 @@ npm run test:search   # Regression check with controlled slow/stale search respo
 
 Type `rounded blue buttons "Launch"`, `React Aria calendar`, or
 `I need a checklist for my PC to get my RTX 3060, CPU, and motherboard`.
-The search field updates immediately. After a short pause, Jev identifies the
-component type, requested content, and styling, then updates the previews together.
-The last completed preview stays visible while typing or waiting for a response;
-new preview frames wait for their actual values before rendering. Clearing search
-resets the catalog immediately. Without Jev, local matching remains immediate.
+Local matches and recognizable values update as you type, without a loading screen.
+Jev refines the component type and contextual content in the background. Existing
+context stays visible until the next response arrives; explicit colors, labels,
+percentages, and item lists apply immediately. Clearing search resets the catalog.
 Library filters sit directly below search; the compact category sidebar can be
 collapsed. No search toggle or suggestion row is required.
 

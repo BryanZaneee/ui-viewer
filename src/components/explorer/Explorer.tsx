@@ -103,8 +103,7 @@ export function Explorer() {
   const params = useMemo(() => new URLSearchParams(search), [search]);
   const query = params.get("q") || "";
   const smart = useSmartSearch(query);
-  const previewQuery = smart.query;
-  const preparing = smart.pending && !previewQuery;
+  const previewQuery = query;
   const library = libraries.some((l) => l.id === params.get("library"))
     ? params.get("library")!
     : "all";
@@ -120,21 +119,33 @@ export function Explorer() {
   );
   const [limit, setLimit] = useState(6);
   const input = useRef<HTMLInputElement>(null);
-  const look = useMemo(
-    () => ({
-      ...appearance(previewQuery),
+  const look = useMemo(() => {
+    const defaults = appearance("");
+    const explicit = Object.fromEntries(
+      Object.entries(appearance(query)).filter(
+        ([key, value]) =>
+          value !== undefined && value !== defaults[key as keyof typeof defaults],
+      ),
+    );
+    // Apply recognizable edits immediately without replacing Jev content with samples.
+    return {
+      ...appearance(smart.query),
       ...smart.values,
-      ...describedValues(previewQuery),
-    }),
-    [previewQuery, smart.values],
-  );
+      ...explicit,
+      ...describedValues(query),
+    };
+  }, [query, smart.query, smart.values]);
   const results = useMemo(() => {
-    const found = searchCatalog(
+    let found = searchCatalog(
       previewQuery,
       library,
       category,
-      smart.pattern,
-    ).filter((e) => !savedOnly || saved.includes(e.id));
+      previewQuery === smart.query ? smart.pattern : null,
+    );
+    // Incomplete words should not blank the gallery while interpretation catches up.
+    if (!found.length && smart.pending)
+      found = searchCatalog(smart.query, library, category, smart.pattern);
+    found = found.filter((e) => !savedOnly || saved.includes(e.id));
     if (
       !previewQuery.trim() &&
       library === "all" &&
@@ -146,7 +157,16 @@ export function Explorer() {
         return (ai < 0 ? 100 : ai) - (bi < 0 ? 100 : bi);
       });
     return found;
-  }, [previewQuery, library, category, savedOnly, saved, smart.pattern]);
+  }, [
+    previewQuery,
+    library,
+    category,
+    savedOnly,
+    saved,
+    smart.query,
+    smart.pattern,
+    smart.pending,
+  ]);
   const change = (values: Record<string, string>) => {
     setSelected(null);
     updateURL(values);
@@ -354,33 +374,21 @@ export function Explorer() {
                 </button>
               </div>
               <div className="component-grid">
-                {preparing ? (
-                  <div
-                    className="empty-results"
-                    role="status"
-                    style={{ gridColumn: "1 / -1" }}
-                  >
-                    Preparing your components…
-                  </div>
-                ) : (
-                  results
-                    .slice(0, limit)
-                    .map((entry) => (
-                      <ComponentCard
-                        key={entry.id}
-                        entry={entry}
-                        appearance={look}
-                        query={previewQuery}
-                        expanded={selected === entry.id}
-                        onExpand={() => setSelected(entry.id)}
-                        onClose={() => setSelected(null)}
-                        saved={saved.includes(entry.id)}
-                        onSave={() => toggleSaved(entry.id)}
-                      />
-                    ))
-                )}
+                {results.slice(0, limit).map((entry) => (
+                  <ComponentCard
+                    key={entry.id}
+                    entry={entry}
+                    appearance={look}
+                    query={previewQuery}
+                    expanded={selected === entry.id}
+                    onExpand={() => setSelected(entry.id)}
+                    onClose={() => setSelected(null)}
+                    saved={saved.includes(entry.id)}
+                    onSave={() => toggleSaved(entry.id)}
+                  />
+                ))}
               </div>
-              {!preparing && !results.length && (
+              {!results.length && (
                 <div className="empty-results">
                   <Search size={30} />
                   <h3>
@@ -402,7 +410,7 @@ export function Explorer() {
                   </button>
                 </div>
               )}
-              {!preparing && results.length > limit && (
+              {results.length > limit && (
                 <button
                   className="load-more"
                   onClick={() => setLimit((v) => v + 6)}

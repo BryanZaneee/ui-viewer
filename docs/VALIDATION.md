@@ -41,3 +41,16 @@ response is ready. Embedded frames wait for actual props before rendering.
 - Release `20261006-220329` is live. Search continuity and the full editor flow
   both pass against the public site, including actual server-side Jev content.
   The server implementation and private environment were unchanged.
+
+## Immediate typing updates
+
+Removed the first-search loading screen. Local catalog matches and explicit
+values update on each keystroke while Jev refines the result in the background.
+Completed contextual values remain available during pending requests.
+
+- Typecheck, nine unit tests, and production builds pass.
+- The browser regression now verifies visible first-search matches, immediate
+  item edits and a new button label before held API responses, plus retained
+  content, stale-response rejection, failures, caching, and clearing.
+- Release `20261006-221612`: the updated search regression and full editor
+  flow both pass on the public site with live Jev enabled.

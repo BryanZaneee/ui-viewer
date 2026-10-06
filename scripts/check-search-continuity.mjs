@@ -6,7 +6,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage();
 const routes = new Map();
 const samples = [];
-let monitor = true;
+let monitor = false;
 await page.exposeFunction("recordSample", (text) => {
   if (monitor) samples.push(text);
 });
@@ -53,13 +53,17 @@ const content = (name) =>
 try {
   await page.goto(`${base}?q=${encodeURIComponent(query)}`);
   await waitForRequest(query);
+  assert(
+    (await page.locator(".component-tile").count()) > 0,
+    "Fresh search must immediately show local matches",
+  );
   assert.equal(
-    await page.locator(".component-tile").count(),
+    await page.getByText("Preparing your components…", { exact: true }).count(),
     0,
-    "Fresh search must not paint sample cards before its response",
   );
   await resolve(query, "RTX 3060");
   await content("RTX 3060").waitFor();
+  monitor = true;
   const originalFrame = await first.locator("iframe").elementHandle();
   const search = page.getByRole("textbox", { name: "Describe a component" });
   // Both the debounce gap and a slow request retain the entire completed preview.
@@ -85,6 +89,15 @@ try {
   await search.fill(query);
   await content("RTX 3060").waitFor();
   assert(!routes.has(query), "Cached query unexpectedly used the network");
+  // Explicit edits update before Jev responds, while contextual items remain visible.
+  const instant = query + " items: RTX 6090, CPU, motherboard";
+  await search.fill(instant);
+  await content("RTX 6090").waitFor({ timeout: 1000 });
+  await waitForRequest(instant);
+  await resolve(instant, "RTX 6090");
+  await page.locator('#component-results[aria-busy="false"]').waitFor();
+  await search.fill(query);
+  await content("RTX 3060").waitFor();
   const failure = query + " in blue";
   await search.fill(failure);
   await (
@@ -121,8 +134,18 @@ try {
       .count(),
     1,
   );
+  // A different component type and label appear before its held API response.
+  await search.fill('blue buttons "Build PC"');
+  await first
+    .frameLocator("iframe")
+    .getByRole("button", { name: "Build PC", exact: true })
+    .waitFor({ timeout: 1500 });
+  assert.equal(
+    await page.getByText("Preparing your components…", { exact: true }).count(),
+    0,
+  );
   console.log(
-    "Search continuity passed: initial loading, debounce, slow responses, stale response rejection, cached results, failure retention, clear, and no sample-text flashes.",
+    "Search continuity passed: immediate local previews and edits, debounce, slow responses, stale response rejection, cached results, failure retention, clear, and no sample-text flashes.",
   );
 } finally {
   await browser.close();

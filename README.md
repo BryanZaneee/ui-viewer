@@ -102,7 +102,8 @@ npm run screenshots
 ```
 
 The script captures desktop, customized previews, and mobile screens using
-Chromium. Run `npx playwright install chromium` if your machine has no browser.
+Chromium. The semantic-search screenshot also requires the Jev service. Run
+`npx playwright install chromium` if your machine has no browser.
 
 ## Contributing
 

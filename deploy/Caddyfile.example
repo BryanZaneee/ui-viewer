@@ -1,4 +1,8 @@
 # Add inside the existing site block. The catalog is static; only semantic search uses Node.
+# Place this exact-path override before inherited deferred security headers.
+@ui_viewer_frame_headers path /ui-viewer/preview.html
+header @ui_viewer_frame_headers >X-Frame-Options "SAMEORIGIN"
+
 redir /ui-viewer /ui-viewer/ permanent
 handle_path /ui-viewer/* {
     handle /api/* {

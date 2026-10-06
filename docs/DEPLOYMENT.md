@@ -37,3 +37,8 @@ Enable and start the service, then verify `/ui-viewer/api/health` and a small
 POST to `/ui-viewer/api/interpret`. No query or key is written to application
 logs. Limits and cache are in-memory and reset on restart. For multiple server
 instances, move these limits to shared storage before scaling out.
+
+If inherited security headers are deferred, keep the example’s site-level exact-path
+X-Frame-Options rule before them. An override inside handle_path alone may be
+overwritten as the response unwinds. Verify the public preview response reports
+SAMEORIGIN and its CSP contains `frame-ancestors 'self'`.

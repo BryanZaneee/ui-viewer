@@ -102,7 +102,8 @@ export function Explorer() {
   const search = useSyncExternalStore(subscribeURL, urlSnapshot, empty);
   const params = useMemo(() => new URLSearchParams(search), [search]);
   const query = params.get("q") || "";
-  const smart = useSmartSearch(query);
+  const [jevEnabled, setJevEnabled] = useState(false);
+  const smart = useSmartSearch(query, jevEnabled);
   const previewQuery = query;
   const library = libraries.some((l) => l.id === params.get("library"))
     ? params.get("library")!
@@ -268,7 +269,14 @@ export function Explorer() {
                   )}
                   <span>{sidebarOpen ? "Hide filters" : "Show filters"}</span>
                 </button>
-                <span>THE COMPONENT PLAYGROUND</span>
+                <label className="jev-option">
+                  <input
+                    type="checkbox"
+                    checked={jevEnabled}
+                    onChange={(e) => setJevEnabled(e.target.checked)}
+                  />
+                  Use Jev
+                </label>
               </div>
               <h1 id="explorer-heading">
                 One idea. <br className="mobile-break" />{" "}

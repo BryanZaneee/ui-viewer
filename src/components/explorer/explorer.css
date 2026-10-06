@@ -1554,3 +1554,19 @@ viewport-mounted library previews. */
     max-height: none;
   }
 }
+
+.jev-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.jev-option input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #6366f1;
+}

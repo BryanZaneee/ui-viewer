@@ -54,3 +54,14 @@ Completed contextual values remain available during pending requests.
   content, stale-response rejection, failures, caching, and clearing.
 - Release `20261006-221612`: the updated search regression and full editor
   flow both pass on the public site with live Jev enabled.
+
+## Optional Jev
+
+The native **Use Jev** checkbox is unchecked on each fresh page load. No health
+or interpretation requests run until it is enabled. Disabling it aborts pending
+work and immediately restores local-only matching and values. The browser
+regression verifies the default, enabling, cancellation, and no further requests
+after disabling, alongside the existing search continuity cases.
+
+Typecheck, nine unit tests, production builds, and the updated browser regression pass.
+Release `20261006-232350`: public opt-in/search regression and full editor checks pass.

@@ -13,7 +13,7 @@ const cache = new Map<
   string,
   { pattern: Pattern | null; values?: Partial<Appearance> }
 >();
-export function useSmartSearch(query: string) {
+export function useSmartSearch(query: string, enabled = false) {
   const [available, setAvailable] = useState<boolean | null>(null);
   const [result, setResult] = useState<Result>({
     query: "",
@@ -22,6 +22,7 @@ export function useSmartSearch(query: string) {
     status: "local",
   });
   useEffect(() => {
+    if (!enabled) return;
     const controller = new AbortController();
     fetch(`${import.meta.env.BASE_URL}api/health`, {
       signal: AbortSignal.any([controller.signal, AbortSignal.timeout(4000)]),
@@ -32,9 +33,9 @@ export function useSmartSearch(query: string) {
         if (!controller.signal.aborted) setAvailable(false);
       });
     return () => controller.abort();
-  }, []);
+  }, [enabled]);
   useEffect(() => {
-    if (!query.trim()) {
+    if (!enabled || !query.trim()) {
       setResult({
         query: "",
         displayQuery: "",
@@ -100,8 +101,8 @@ export function useSmartSearch(query: string) {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [query, available]);
-  const local = available === false || !query.trim();
+  }, [query, available, enabled]);
+  const local = !enabled || available === false || !query.trim();
   return {
     available,
     query: local ? query : result.displayQuery,

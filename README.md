@@ -38,11 +38,12 @@ npm run test:search   # Regression check with controlled slow/stale search respo
 Type `rounded blue buttons "Launch"`, `React Aria calendar`, or
 `I need a checklist for my PC to get my RTX 3060, CPU, and motherboard`.
 Local matches and recognizable values update as you type, without a loading screen.
-Jev refines the component type and contextual content in the background. Existing
+The **Use Jev** checkbox is off by default. Enable it to refine the component type
+and contextual content in the background; unchecking it cancels pending AI work. Existing
 context stays visible until the next response arrives; explicit colors, labels,
 percentages, and item lists apply immediately. Clearing search resets the catalog.
 Library filters sit directly below search; the compact category sidebar can be
-collapsed. No search toggle or suggestion row is required.
+collapsed. The optional Jev checkbox leaves the compact library filters in place.
 
 Click any live preview to smoothly expand a workbench with color, corner, spacing,
 scale, theme, and density controls, plus relevant text, list, percentage, price,

@@ -52,6 +52,11 @@ const content = (name) =>
   first.frameLocator("iframe").getByText(name, { exact: true });
 try {
   await page.goto(`${base}?q=${encodeURIComponent(query)}`);
+  const jev = page.getByRole("checkbox", { name: "Use Jev" });
+  assert.equal(await jev.isChecked(), false);
+  await page.waitForTimeout(700);
+  assert.equal(routes.size, 0, "Default local search must not call Jev");
+  await jev.check();
   await waitForRequest(query);
   assert(
     (await page.locator(".component-tile").count()) > 0,
@@ -144,8 +149,25 @@ try {
     await page.getByText("Preparing your components…", { exact: true }).count(),
     0,
   );
+  const buttonQuery = 'blue buttons "Build PC"';
+  await waitForRequest(buttonQuery);
+  await jev.uncheck();
+  await routes.get(buttonQuery)
+    .fulfill({
+      json: { pattern: "checkbox", values: { label: "Stale AI label" } },
+    })
+    .catch(() => {});
+  const requestsBefore = routes.size;
+  await search.fill('red buttons "Local only"');
+  await first
+    .frameLocator("iframe")
+    .getByRole("button", { name: "Local only", exact: true })
+    .waitFor();
+  await page.waitForTimeout(700);
+  assert.equal(routes.size, requestsBefore, "Disabled Jev must stop requests");
+  assert.equal(await jev.isChecked(), false);
   console.log(
-    "Search continuity passed: immediate local previews and edits, debounce, slow responses, stale response rejection, cached results, failure retention, clear, and no sample-text flashes.",
+    "Search continuity passed: Jev off by default, opt-in and cancellation, immediate local previews and edits, debounce, slow responses, stale response rejection, cached results, failure retention, clear, and no sample-text flashes.",
   );
 } finally {
   await browser.close();

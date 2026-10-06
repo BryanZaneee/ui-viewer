@@ -27,6 +27,7 @@ try {
   await page.getByRole("button", { name: "Hide filters" }).click();
   assert.equal(await page.locator("#component-sidebar").isVisible(), false);
   await page.getByRole("button", { name: "Show filters" }).click();
+  await page.getByRole("checkbox", { name: "Use Jev" }).check();
   await search.fill(query);
   await page.waitForResponse(
     (r) => r.url().endsWith("/api/interpret") && r.status() === 200,

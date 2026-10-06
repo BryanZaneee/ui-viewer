@@ -37,6 +37,7 @@ try {
     .locator('[data-dark="true"]')
     .waitFor();
   await page.screenshot({ path: "docs/screenshots/customize-dark.webp" });
+  await page.getByRole("checkbox", { name: "Use Jev" }).check();
   await search.fill(
     "I need a checklist for my PC to get my RTX 3060, CPU, and motherboard",
   );

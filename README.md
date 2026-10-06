@@ -1,12 +1,15 @@
 # UI Viewer
 
-Search and customize 139 interactive UI previews across 14 component families, with live styling, Jev-powered description matching, saved collections, and source inspection.
+Search and customize 139 interactive UI previews across 14 component families, with live styling and Jev-powered description matching.
 
 ![UI Viewer component catalog](docs/screenshots/explore.webp)
 _Local preview with sample content. Library components load as they enter the viewport._
 
 ![Live component customization](docs/screenshots/customize.webp)
 _The same description updates component colors, shape, and labels across libraries._
+
+![Jev matches a natural-language request to data tables](docs/screenshots/smart-search.webp)
+_Live deployment: a description of team records surfaces table components across libraries._
 
 [Live app](https://bryanzane.com/ui-viewer/) · [Library attribution](docs/ATTRIBUTION.md)
 

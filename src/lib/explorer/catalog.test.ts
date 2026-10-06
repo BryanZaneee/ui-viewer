@@ -80,7 +80,23 @@ test("all legacy TSX starters parse, including quoted labels", () => {
 });
 
 test("semantic matches preserve explicit library and category filters", () => {
-  assert.equal(searchCatalog("pick a day for an appointment", "all", "All components", "calendar")[0].pattern.id, "calendar");
-  assert(searchCatalog("mui appointment", "all", "All components", "calendar").every(e => e.library.id === "mui"));
-  assert(searchCatalog("appointment", "all", "Forms", "calendar").every(e => e.pattern.category === "Forms"));
+  assert.equal(
+    searchCatalog(
+      "pick a day for an appointment",
+      "all",
+      "All components",
+      "calendar",
+    )[0].pattern.id,
+    "calendar",
+  );
+  assert(
+    searchCatalog("mui appointment", "all", "All components", "calendar").every(
+      (e) => e.library.id === "mui",
+    ),
+  );
+  assert(
+    searchCatalog("appointment", "all", "Forms", "calendar").every(
+      (e) => e.pattern.category === "Forms",
+    ),
+  );
 });

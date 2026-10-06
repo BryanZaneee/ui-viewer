@@ -35,4 +35,15 @@ await page
 await page.screenshot({ path: "docs/screenshots/customize-dark.webp" });
 await page.setViewportSize({ width: 390, height: 844 });
 await page.screenshot({ path: "docs/screenshots/mobile.webp" });
+if (await page.getByRole("checkbox", { name: "Smart search" }).count()) {
+  await page.setViewportSize({ width: 1500, height: 1100 });
+  await page
+    .getByRole("textbox", { name: "Describe a component" })
+    .fill("Display my team in rows with their job titles");
+  await page
+    .getByText("Description matched", { exact: true })
+    .waitFor({ timeout: 15000 });
+  await page.frameLocator("iframe").first().getByRole("table").waitFor();
+  await page.screenshot({ path: "docs/screenshots/smart-search.webp" });
+}
 await browser.close();

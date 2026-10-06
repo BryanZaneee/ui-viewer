@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Bookmark, Code2, Copy, Dice5, RotateCcw, X, Plus } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -18,6 +18,7 @@ import { Preview } from "./Preview";
 
 type Props = {
   entry: Entry;
+  entranceIndex?: number;
   appearance: Appearance;
   query: string;
   expanded: boolean;
@@ -28,6 +29,7 @@ type Props = {
 };
 export function ComponentCard({
   entry,
+  entranceIndex = 0,
   appearance,
   query,
   expanded,
@@ -36,6 +38,7 @@ export function ComponentCard({
   saved,
   onSave,
 }: Props) {
+  const reducedMotion = useReducedMotion();
   const [edit, setEdit] = useState<{
     query: string;
     values: Partial<Appearance>;
@@ -145,8 +148,14 @@ export function ComponentCard({
   );
   return (
     <motion.article
-      layout
-      transition={{ type: "spring", stiffness: 320, damping: 34 }}
+      layout="position"
+      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        layout: { type: "spring", stiffness: 320, damping: 34 },
+        opacity: { duration: 0.22, delay: reducedMotion ? 0 : entranceIndex * 0.035 },
+        y: { duration: 0.28, delay: reducedMotion ? 0 : entranceIndex * 0.035 },
+      }}
       className={`component-tile ${expanded ? "is-expanded" : ""}`}
       onKeyDown={(e) => {
         if (e.key === "Escape" && expanded) {
@@ -388,11 +397,11 @@ export function ComponentCard({
             </button>
           </h3>
           <span>
-            {reference
+            {entry.pattern.category} · {reference
               ? "Reference link"
               : entry.library.id === "swiftui"
                 ? "Apple · Browser approximation"
-                : entry.pattern.category}
+                : "Interactive preview"}
           </span>
         </div>
         <button
@@ -414,7 +423,7 @@ export function ComponentCard({
           >
             <div className="editor-toolbar">
               <strong>
-                {entry.library.id === "swiftui"
+                {reference ? "Library reference" : entry.library.id === "swiftui"
                   ? "SwiftUI starter"
                   : "Component code"}
               </strong>

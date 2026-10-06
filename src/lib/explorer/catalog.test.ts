@@ -31,6 +31,10 @@ test("natural descriptions, aliases, prefixes and filters resolve the right comp
     ["radix themes table", "radix-themes-table"],
     ["magic ui animated text", "magicui-aurora"],
     ["daisyui rating", "daisyui-rating"],
+    ["Bits UI slider", "bits-ui-slider"],
+    ["Headless UI dialog", "headlessui-dialog"],
+    ["Reka UI calendar", "reka-calendar"],
+    ["UIKit button", "uikit-button"],
   ])
     assert(
       searchCatalog(query).some((e) => e.id === id),
@@ -143,4 +147,18 @@ test("live values parse numbers by purpose, bound inputs and preserve content", 
   );
   assert(swift.includes('"RTX 3060", "CPU", "motherboard"'));
   assert(swift.includes("selected.contains(index)"));
+});
+
+test("library directory is alphabetical and references never become live adapters", async () => {
+  const { libraryGroups } = await import("./catalog");
+  assert.deepEqual(libraries.map((l) => l.name), libraries.map((l) => l.name).sort(
+    (a, b) => a.localeCompare(b, "en", { sensitivity: "base" }),
+  ));
+  for (const library of libraries) assert(libraryGroups.includes(library.group));
+  for (const id of ["bits-ui", "headlessui", "reka", "uikit"] as const) {
+    assert(isReference(id));
+    assert(!liveLibraries.some((l) => l.id === id));
+    assert(searchCatalog("", id).length > 0);
+    assert(searchCatalog("", id).every((e) => e.library.id === id));
+  }
 });

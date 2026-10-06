@@ -1,7 +1,8 @@
 import { describedValues } from "./values";
-export const libraries = [
+const libraryDefinitions = [
   {
     id: "shadcn",
+    group: "Web UI",
     name: "shadcn/ui",
     mark: "◩",
     platform: "React",
@@ -12,6 +13,7 @@ export const libraries = [
   },
   {
     id: "swiftui",
+    group: "Apple UI",
     name: "SwiftUI",
     mark: "􀣺",
     platform: "Apple",
@@ -21,6 +23,7 @@ export const libraries = [
   },
   {
     id: "mui",
+    group: "Web UI",
     name: "Material UI",
     mark: "M",
     platform: "React",
@@ -30,6 +33,7 @@ export const libraries = [
   },
   {
     id: "mantine",
+    group: "Web UI",
     name: "Mantine",
     mark: "m",
     platform: "React",
@@ -39,6 +43,7 @@ export const libraries = [
   },
   {
     id: "radix",
+    group: "Web UI",
     name: "Radix UI",
     mark: "◐",
     platform: "React",
@@ -48,6 +53,7 @@ export const libraries = [
   },
   {
     id: "antd",
+    group: "Web UI",
     name: "Ant Design",
     mark: "◇",
     platform: "React",
@@ -57,6 +63,7 @@ export const libraries = [
   },
   {
     id: "heroui",
+    group: "Web UI",
     name: "HeroUI",
     mark: "H",
     platform: "React",
@@ -66,6 +73,7 @@ export const libraries = [
   },
   {
     id: "daisyui",
+    group: "Web UI",
     name: "daisyUI",
     mark: "\u273f",
     platform: "React",
@@ -75,6 +83,7 @@ export const libraries = [
   },
   {
     id: "magicui",
+    group: "Motion & effects",
     name: "Magic UI",
     mark: "\u2727",
     platform: "React",
@@ -85,6 +94,7 @@ export const libraries = [
   },
   {
     id: "chakra",
+    group: "Web UI",
     name: "Chakra UI",
     mark: "\u26a1",
     platform: "React",
@@ -94,6 +104,7 @@ export const libraries = [
   },
   {
     id: "radix-themes",
+    group: "Web UI",
     name: "Radix Themes",
     mark: "\u25d2",
     platform: "React",
@@ -103,6 +114,7 @@ export const libraries = [
   },
   {
     id: "fluent",
+    group: "Web UI",
     name: "Fluent UI",
     mark: "F",
     platform: "React",
@@ -112,6 +124,7 @@ export const libraries = [
   },
   {
     id: "carbon",
+    group: "Web UI",
     name: "Carbon",
     mark: "C",
     platform: "React",
@@ -121,6 +134,7 @@ export const libraries = [
   },
   {
     id: "react-aria",
+    group: "Web UI",
     name: "React Aria",
     mark: "A",
     platform: "React",
@@ -130,6 +144,7 @@ export const libraries = [
   },
   {
     id: "reactbits",
+    group: "Motion & effects",
     name: "React Bits",
     mark: "\u219d",
     platform: "Link",
@@ -140,6 +155,7 @@ export const libraries = [
   },
   {
     id: "aceternity",
+    group: "Motion & effects",
     name: "Aceternity UI",
     mark: "\u2301",
     platform: "Link",
@@ -148,7 +164,51 @@ export const libraries = [
     install:
       "Reference only. Visit the original library for licensing and installation.",
   },
+  {
+    id: "bits-ui",
+    name: "Bits UI",
+    group: "Web UI",
+    mark: "B",
+    platform: "Link",
+    color: "#6952d5",
+    docs: "https://www.bits-ui.com/",
+    install: "Reference only. Visit the official documentation for setup and licensing.",
+  },
+  {
+    id: "headlessui",
+    name: "Headless UI",
+    group: "Web UI",
+    mark: "H",
+    platform: "Link",
+    color: "#6952d5",
+    docs: "https://headlessui.com/",
+    install: "Reference only. Visit the official documentation for setup and licensing.",
+  },
+  {
+    id: "reka",
+    name: "Reka UI",
+    group: "Web UI",
+    mark: "R",
+    platform: "Link",
+    color: "#6952d5",
+    docs: "https://reka-ui.com/",
+    install: "Reference only. Visit the official documentation for setup and licensing.",
+  },
+  {
+    id: "uikit",
+    name: "UIKit",
+    group: "Apple UI",
+    mark: "U",
+    platform: "Link",
+    color: "#6952d5",
+    docs: "https://developer.apple.com/documentation/uikit",
+    install: "Reference only. Visit the official documentation for setup and licensing.",
+  },
 ] as const;
+export const libraries = [...libraryDefinitions].sort((a, b) =>
+  a.name.localeCompare(b.name, "en", { sensitivity: "base" }),
+);
+export const libraryGroups = ["Apple UI", "Motion & effects", "Web UI"] as const;
 export type Library = (typeof libraries)[number]["id"];
 export const patterns = [
   {
@@ -348,7 +408,7 @@ export type Entry = {
   library: (typeof libraries)[number];
   pattern: (typeof patterns)[number];
 };
-// Explicit support lists: an entry exists only when its renderer implements it.
+// Live entries require a renderer; reference entries link to the original library.
 export const supported: Record<Library, readonly Pattern[]> = {
   shadcn: [
     "button",
@@ -507,9 +567,13 @@ export const supported: Record<Library, readonly Pattern[]> = {
   ],
   reactbits: ["particles", "aurora"],
   aceternity: ["3d-card", "particles"],
+  "bits-ui": ["accordion", "slider"],
+  headlessui: ["dialog", "tabs", "switch"],
+  reka: ["accordion", "calendar"],
+  uikit: ["button", "input"],
 };
 export const isReference = (id: Library) =>
-  id === "reactbits" || id === "aceternity";
+  libraries.find((library) => library.id === id)?.platform === "Link";
 export const liveLibraries = libraries.filter((l) => !isReference(l.id));
 export const catalog: Entry[] = patterns.flatMap((pattern) =>
   libraries
@@ -601,7 +665,11 @@ const normalize = (s: string) =>
     .replace(/react[- ]aria/g, "reactaria")
     .replace(/fluent ui/g, "fluent")
     .replace(/react bits/g, "reactbits")
-    .replace(/aceternity ui/g, "aceternity");
+    .replace(/aceternity ui/g, "aceternity")
+    .replace(/bits[- ]ui/g, "bitsui")
+    .replace(/headless ui/g, "headlessui")
+    .replace(/reka ui/g, "reka")
+    .replace(/ui kit/g, "uikit");
 export function searchCatalog(
   query: string,
   library = "all",

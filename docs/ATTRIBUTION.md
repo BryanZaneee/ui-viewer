@@ -22,6 +22,10 @@ is retained in [LICENSE](../LICENSE).
 | React Aria       | Installed behavior components with authored styling                           | [Apache 2.0](https://github.com/adobe/react-spectrum/blob/main/LICENSE)         |
 | React Bits       | Searchable descriptions and external links only                               | [Creator license](https://github.com/DavidHDev/react-bits/blob/main/LICENSE.md) |
 | Aceternity UI    | Searchable descriptions and external links only                               | [Creator license](https://ui.aceternity.com/licence)                            |
+| Bits UI | Searchable descriptions and external links only | [Official documentation](https://www.bits-ui.com/) |
+| Headless UI | Searchable descriptions and external links only | [Official documentation](https://headlessui.com/) |
+| Reka UI | Searchable descriptions and external links only | [Official documentation](https://reka-ui.com/) |
+| UIKit | Searchable descriptions and external links only | [Official documentation](https://developer.apple.com/documentation/uikit) |
 
 SwiftUI does not execute natively in the browser. Use its generated Swift in
 Xcode for native rendering. React Bits and Aceternity source is not bundled or

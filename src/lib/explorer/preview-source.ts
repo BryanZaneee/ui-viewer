@@ -1,4 +1,4 @@
-import type { Entry, Appearance } from "./catalog";
+import { isReference, type Entry, type Appearance } from "./catalog";
 const sources = import.meta.glob("../../components/explorer/*Preview.tsx", {
   query: "?raw",
   import: "default",
@@ -34,7 +34,7 @@ export async function previewSource(
         "\n",
       )}\n\n// Adapter implementation: src/components/explorer/${name}Preview.tsx\n${source}`;
   }
-  if (entry.library.id === "reactbits" || entry.library.id === "aceternity")
+  if (isReference(entry.library.id))
     return `Reference only.\n\nExplore ${entry.library.docs}\n\nSource is not redistributed here. Check the creator’s current license before incorporating components.`;
   const { sourceFor } = await import("./source");
   return sourceFor(entry, a);

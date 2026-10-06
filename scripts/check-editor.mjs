@@ -8,6 +8,10 @@ page.on("pageerror", (error) => errors.push(error.message));
 const query =
   "I need a checklist for my PC to get my RTX 3060, CPU, and motherboard";
 try {
+  await page.route("**/api/health", (route) => route.fulfill({ json: { available: true } }));
+  await page.route("**/api/interpret", (route) => route.fulfill({
+    json: { pattern: "checkbox", values: { items: ["RTX 3060", "CPU", "motherboard"] } },
+  }));
   await page.goto(base);
   assert.equal(
     await page.getByText("Smart search", { exact: true }).count(),
@@ -18,12 +22,8 @@ try {
     0,
   );
   const search = page.getByRole("textbox", { name: "Describe a component" });
-  const searchBox = await page.locator(".explorer-search").boundingBox();
-  const filters = await page.locator(".library-filters").boundingBox();
-  assert(
-    filters.y >= searchBox.y + searchBox.height &&
-      filters.y - searchBox.y - searchBox.height < 20,
-  );
+  assert.equal(await page.locator(".explorer-hero .library-filters").count(), 0);
+  assert(await page.locator("#component-sidebar .sidebar-libraries").isVisible());
   await page.getByRole("button", { name: "Hide filters" }).click();
   assert.equal(await page.locator("#component-sidebar").isVisible(), false);
   await page.getByRole("button", { name: "Show filters" }).click();
@@ -91,6 +91,7 @@ try {
   await first
     .getByRole("region", { name: "Customize component" })
     .waitFor({ state: "detached" });
+  await page.getByRole("checkbox", { name: "Use Jev" }).uncheck();
   await search.fill('blue buttons "Build PC"');
   await first
     .frameLocator("iframe")
@@ -107,14 +108,14 @@ try {
   await progress
     .frameLocator("iframe")
     .getByText("72%", { exact: true })
-    .waitFor();
+    .first().waitFor();
   await progress.locator(".preview-open").click();
   await progress.getByRole("slider", { name: "Value" }).press("Home");
   await progress.getByRole("slider", { name: "Value" }).press("ArrowRight");
   await progress
     .frameLocator("iframe")
     .getByText("1%", { exact: true })
-    .waitFor();
+    .first().waitFor();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.getByRole("slider", { name: "Spacing" }).press("Home");
@@ -126,7 +127,7 @@ try {
   );
   assert.deepEqual(errors, []);
   console.log(
-    "Editor checks passed: live Jev content, filters, expansion, code, sliders, color, heading, randomize, reset, items, keyboard and mobile.",
+    "Editor checks passed: mocked Jev content, filters, expansion, code, sliders, color, heading, randomize, reset, items, keyboard and mobile.",
   );
 } finally {
   await browser.close();

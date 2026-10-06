@@ -83,6 +83,7 @@ export function Preview({
         <iframe
           ref={frame}
           className="preview-frame"
+          data-ready={ready}
           title={`${entry.library.name} ${entry.pattern.name} interactive preview`}
           src={`${import.meta.env.BASE_URL}preview.html?entry=${encodeURIComponent(entry.id)}`}
           loading="lazy"

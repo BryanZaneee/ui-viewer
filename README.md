@@ -2,7 +2,7 @@
 
 Search and customize 139 interactive UI previews across 14 component families, with live styling, inline editors, and Jev-powered content matching.
 
-![UI Viewer component catalog](docs/screenshots/explore.webp)
+![UI Viewer component catalog](docs/screenshots/explore.png)
 _Local preview with sample content. Library components load as they enter the viewport._
 
 ![Live component customization](docs/screenshots/customize.webp)
@@ -29,7 +29,7 @@ npm run check       # Typecheck, catalog/source checks, production build
 npm run preview     # Serve the static production build
 npm run bundle      # Measure compressed shell assets
 npm run test:previews # Check all previews with the preview server running
-npm run test:editor   # Exercise the editor with a running preview and Jev service
+npm run test:editor   # Exercise the editor with a running preview and mocked Jev responses
 npm run test:search   # Regression check with controlled slow/stale search responses
 ```
 
@@ -42,8 +42,9 @@ The **Use Jev** checkbox is off by default. Enable it to refine the component ty
 and contextual content in the background; unchecking it cancels pending AI work. Existing
 context stays visible until the next response arrives; explicit colors, labels,
 percentages, and item lists apply immediately. Clearing search resets the catalog.
-Library filters sit directly below search; the compact category sidebar can be
-collapsed. The optional Jev checkbox leaves the compact library filters in place.
+Libraries are alphabetized within collapsible Apple UI, Motion & effects, and Web UI
+sidebar groups. Component-type filters also live in the sidebar; active filters appear
+above the results. The sidebar can be hidden and is scrollable on mobile.
 
 Click any live preview to smoothly expand a workbench with color, corner, spacing,
 scale, theme, and density controls, plus relevant text, list, percentage, price,
@@ -64,10 +65,10 @@ preserve mounted interactions; changing list content resets list selection.
 Per-card edits last while the card remains in the current search. Shared URLs
 include the search and filters, not unsaved per-card edits.
 
-The catalog contains 139 interactive entries plus four reference links. Counts
+The catalog contains 139 interactive entries plus 13 reference entries across 20 libraries. Counts
 are library/pattern combinations, not 139 unique component types. SwiftUI is a
-clearly labeled browser approximation with Swift source for Xcode. React Bits
-and Aceternity are reference links rather than bundled source.
+clearly labeled browser approximation with Swift source for Xcode. React Bits,
+Aceternity, Bits UI, Headless UI, Reka UI, and UIKit are reference links rather than bundled source.
 
 React previews show their configured props and actual adapter source, which imports
 the shared renderer, types, and styles in this repository. SwiftUI offers a native starter.

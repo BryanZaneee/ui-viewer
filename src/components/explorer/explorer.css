@@ -1570,3 +1570,47 @@ viewport-mounted library previews. */
   margin: 0;
   accent-color: #6366f1;
 }
+
+/* Library navigation stays in the sidebar as the catalog grows. */
+.explorer-layout {
+  grid-template-columns: 250px minmax(0, 1fr);
+}
+.library-group { margin-top: 8px; }
+.library-group summary {
+  cursor: pointer;
+  padding: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ex-muted);
+}
+.library-group summary span { float: right; font-weight: 400; }
+.library-group summary:focus-visible {
+  outline: 2px solid var(--ex-purple);
+  outline-offset: 2px;
+}
+.library-mark { width: 15px; text-align: center; flex-shrink: 0; }
+.reference-tag { font-size: 9px !important; }
+.side-item { transition: background-color 150ms ease, color 150ms ease; }
+.result-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 14px;
+  color: var(--ex-muted);
+  font-size: 11px;
+}
+.result-context button { color: var(--ex-purple); text-decoration: underline; }
+.preview-frame { opacity: 0; transition: opacity 220ms ease; }
+.preview-frame[data-ready="true"] { opacity: 1; }
+@media (max-width: 760px) {
+  .explorer-sidebar {
+    display: block;
+    max-height: 55dvh;
+    overflow-y: auto;
+  }
+  .explorer-sidebar .side-item { width: 100%; min-height: 36px; }
+  .explorer-sidebar .sidebar-label { display: flex; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .preview-frame, .side-item { transition: none; }
+}

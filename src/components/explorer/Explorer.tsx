@@ -19,6 +19,8 @@ import {
   catalog,
   categories,
   libraries,
+  libraryGroups,
+  isReference,
   liveLibraries,
   searchCatalog,
 } from "@/lib/explorer/catalog";
@@ -233,6 +235,26 @@ export function Explorer() {
               <Bookmark size={17} />
               Saved<span>{saved.length}</span>
             </button>
+            <nav aria-label="Filter by library" className="sidebar-libraries">
+              <div className="sidebar-label spaced">LIBRARIES · A–Z</div>
+              <button className={`side-item ${library === "all" ? "selected" : ""}`}
+                aria-pressed={library === "all"} onClick={() => change({ library: "" })}>
+                All libraries <span>{libraries.length}</span>
+              </button>
+              {libraryGroups.map((group) => (
+                <details className="library-group" key={group} open>
+                  <summary>{group}<span>{libraries.filter((l) => l.group === group).length}</span></summary>
+                  {libraries.filter((l) => l.group === group).map((l) => (
+                    <button key={l.id} className={`side-item ${library === l.id ? "selected" : ""}`}
+                      aria-pressed={library === l.id} onClick={() => change({ library: l.id })}>
+                      <span className="library-mark" aria-hidden="true" style={{ color: l.color }}>{l.id === "swiftui" ? "S" : l.mark}</span>
+                      {l.name}
+                      {isReference(l.id) && <span className="reference-tag">Reference</span>}
+                    </button>
+                  ))}
+                </details>
+              ))}
+            </nav>
             <div className="sidebar-label spaced">BROWSE BY TYPE</div>
             {categories.map((c, i) => (
               <button
@@ -323,28 +345,7 @@ export function Explorer() {
                   </span>
                 )}
               </div>
-              <div className="library-filters" aria-label="Filter by library">
-                <button
-                  className={library === "all" ? "active" : ""}
-                  aria-pressed={library === "all"}
-                  onClick={() => change({ library: "" })}
-                >
-                  All libraries
-                </button>
-                {libraries.map((l) => (
-                  <button
-                    key={l.id}
-                    className={library === l.id ? "active" : ""}
-                    aria-pressed={library === l.id}
-                    onClick={() => change({ library: l.id })}
-                  >
-                    <span style={{ color: l.color }}>
-                      {l.id === "swiftui" ? "S" : l.mark}
-                    </span>
-                    {l.name}
-                  </button>
-                ))}
-              </div>
+
             </section>
             <section
               className="results-section"
@@ -381,11 +382,18 @@ export function Explorer() {
                   Share search
                 </button>
               </div>
+              <div className="result-context">
+                <span>{library === "all" ? "All libraries" : libraries.find((l) => l.id === library)?.name} · {category}</span>
+                {(library !== "all" || category !== "All components") &&
+                  <button onClick={() => change({ library: "", category: "" })}>Clear filters</button>}
+                {jevEnabled && <span role="status">{smart.available === false ? "Jev unavailable · local matching" : smart.pending ? "Jev is matching your idea…" : "Jev matches types and styles across libraries"}</span>}
+              </div>
               <div className="component-grid">
-                {results.slice(0, limit).map((entry) => (
+                {results.slice(0, limit).map((entry, index) => (
                   <ComponentCard
                     key={entry.id}
                     entry={entry}
+                    entranceIndex={index % 6}
                     appearance={look}
                     query={previewQuery}
                     expanded={selected === entry.id}

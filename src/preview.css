@@ -1,0 +1,39 @@
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  width: 100%;
+}
+body {
+  background: transparent;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+.component-preview {
+  min-height: 100dvh;
+  height: auto;
+  padding: 24px 20px;
+  align-items: safe center;
+}
+.preview-inner {
+  max-width: 360px;
+}
+.radix-themes {
+  min-height: 0 !important;
+}
+.library-carbon {
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+}
+.library-react-aria .preview-inner {
+  max-width: 300px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

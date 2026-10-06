@@ -1,0 +1,53 @@
+@keyframes aurora {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+.animate-aurora {
+  animation: aurora 10s ease-in-out infinite;
+}
+.animate-marquee {
+  animation: marquee var(--duration, 40s) linear infinite;
+}
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration, 40s) linear infinite;
+}
+.magic-demo {
+  overflow: hidden;
+}
+.magic-chip {
+  display: block;
+  border: 1px solid var(--demo-line);
+  background: var(--demo-bg);
+  padding: 12px 20px;
+  border-radius: var(--demo-radius);
+  font-weight: 600;
+  color: var(--demo-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora,
+  .animate-marquee,
+  .animate-marquee-vertical {
+    animation: none !important;
+  }
+}
